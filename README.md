@@ -1,7 +1,10 @@
 # GoLLM - Unified Go SDK for Large Language Models
 
-[![Go Version](https://img.shields.io/badge/go-%3E%3D1.24-blue)](https://golang.org/doc/devel/release.html)
-[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+[![Build Status][build-status-svg]][build-status-url]
+[![Lint Status][lint-status-svg]][lint-status-url]
+[![Go Report Card][goreport-svg]][goreport-url]
+[![Docs][docs-godoc-svg]][docs-godoc-url]
+[![License][license-svg]][license-url]
 
 GoLLM is a unified Go SDK that provides a consistent interface for interacting with multiple Large Language Model (LLM) providers including OpenAI, Anthropic (Claude), and AWS Bedrock. It implements the Chat Completions API pattern and offers both synchronous and streaming capabilities.
 
@@ -326,3 +329,16 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ---
 
 **Made with ❤️ for the Go and AI community**
+
+ [build-status-svg]: https://github.com/grokify/gollm/actions/workflows/ci.yaml/badge.svg?branch=main
+ [build-status-url]: https://github.com/grokify/gollm/actions/workflows/ci.yaml
+ [lint-status-svg]: https://github.com/grokify/gollm/actions/workflows/lint.yaml/badge.svg?branch=main
+ [lint-status-url]: https://github.com/grokify/gollm/actions/workflows/lint.yaml
+ [goreport-svg]: https://goreportcard.com/badge/github.com/grokify/gollm
+ [goreport-url]: https://goreportcard.com/report/github.com/grokify/gollm
+ [docs-godoc-svg]: https://pkg.go.dev/badge/github.com/grokify/gollm
+ [docs-godoc-url]: https://pkg.go.dev/github.com/grokify/gollm/v2
+ [license-svg]: https://img.shields.io/badge/license-MIT-blue.svg
+ [license-url]: https://github.com/grokify/gollm/blob/master/LICENSE
+ [used-by-svg]: https://sourcegraph.com/github.com/grokify/gollm/-/badge.svg
+ [used-by-url]: https://sourcegraph.com/github.com/grokify/gollm?badge
