@@ -332,7 +332,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
  [goreport-svg]: https://goreportcard.com/badge/github.com/grokify/gollm
  [goreport-url]: https://goreportcard.com/report/github.com/grokify/gollm
  [docs-godoc-svg]: https://pkg.go.dev/badge/github.com/grokify/gollm
- [docs-godoc-url]: https://pkg.go.dev/github.com/grokify/gollm/v2
+ [docs-godoc-url]: https://pkg.go.dev/github.com/grokify/gollm
  [license-svg]: https://img.shields.io/badge/license-MIT-blue.svg
  [license-url]: https://github.com/grokify/gollm/blob/master/LICENSE
  [used-by-svg]: https://sourcegraph.com/github.com/grokify/gollm/-/badge.svg
