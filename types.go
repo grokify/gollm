@@ -1,6 +1,5 @@
 package gollm
 
-
 // Role represents the role of a message sender
 type Role string
 
@@ -13,11 +12,11 @@ const (
 
 // Message represents a chat message
 type Message struct {
-	Role       Role        `json:"role"`
-	Content    string      `json:"content"`
-	Name       *string     `json:"name,omitempty"`
-	ToolCallID *string     `json:"tool_call_id,omitempty"`
-	ToolCalls  []ToolCall  `json:"tool_calls,omitempty"`
+	Role       Role       `json:"role"`
+	Content    string     `json:"content"`
+	Name       *string    `json:"name,omitempty"`
+	ToolCallID *string    `json:"tool_call_id,omitempty"`
+	ToolCalls  []ToolCall `json:"tool_calls,omitempty"`
 }
 
 // ToolCall represents a tool function call
@@ -35,25 +34,25 @@ type ToolFunction struct {
 
 // ChatCompletionRequest represents a request for chat completion
 type ChatCompletionRequest struct {
-	Model            string    `json:"model"`
-	Messages         []Message `json:"messages"`
-	MaxTokens        *int      `json:"max_tokens,omitempty"`
-	Temperature      *float64  `json:"temperature,omitempty"`
-	TopP             *float64  `json:"top_p,omitempty"`
-	Stream           *bool     `json:"stream,omitempty"`
-	Stop             []string  `json:"stop,omitempty"`
-	PresencePenalty  *float64  `json:"presence_penalty,omitempty"`
-	FrequencyPenalty *float64  `json:"frequency_penalty,omitempty"`
+	Model            string         `json:"model"`
+	Messages         []Message      `json:"messages"`
+	MaxTokens        *int           `json:"max_tokens,omitempty"`
+	Temperature      *float64       `json:"temperature,omitempty"`
+	TopP             *float64       `json:"top_p,omitempty"`
+	Stream           *bool          `json:"stream,omitempty"`
+	Stop             []string       `json:"stop,omitempty"`
+	PresencePenalty  *float64       `json:"presence_penalty,omitempty"`
+	FrequencyPenalty *float64       `json:"frequency_penalty,omitempty"`
 	LogitBias        map[string]int `json:"logit_bias,omitempty"`
-	User             *string   `json:"user,omitempty"`
-	Tools            []Tool    `json:"tools,omitempty"`
-	ToolChoice       interface{} `json:"tool_choice,omitempty"`
+	User             *string        `json:"user,omitempty"`
+	Tools            []Tool         `json:"tools,omitempty"`
+	ToolChoice       interface{}    `json:"tool_choice,omitempty"`
 }
 
 // Tool represents a tool that can be called
 type Tool struct {
-	Type     string       `json:"type"`
-	Function ToolSpec     `json:"function"`
+	Type     string   `json:"type"`
+	Function ToolSpec `json:"function"`
 }
 
 // ToolSpec defines a tool specification
@@ -76,10 +75,10 @@ type ChatCompletionResponse struct {
 
 // ChatCompletionChoice represents a single choice in the response
 type ChatCompletionChoice struct {
-	Index        int     `json:"index"`
-	Message      Message `json:"message"`
-	Delta        *Message `json:"delta,omitempty"`
-	FinishReason *string `json:"finish_reason"`
+	Index        int         `json:"index"`
+	Message      Message     `json:"message"`
+	Delta        *Message    `json:"delta,omitempty"`
+	FinishReason *string     `json:"finish_reason"`
 	Logprobs     interface{} `json:"logprobs,omitempty"`
 }
 
@@ -103,26 +102,26 @@ type ChatCompletionChunk struct {
 
 // ModelInfo represents information about a model
 type ModelInfo struct {
-	ID       string `json:"id"`
-	Provider ProviderName `json:"provider"`
-	Name     string `json:"name"`
-	MaxTokens int   `json:"max_tokens"`
+	ID        string       `json:"id"`
+	Provider  ProviderName `json:"provider"`
+	Name      string       `json:"name"`
+	MaxTokens int          `json:"max_tokens"`
 }
 
 // Common model constants for each provider
 const (
 	// OpenAI Models
-	ModelGPT4o           = "gpt-4o"
-	ModelGPT4oMini       = "gpt-4o-mini"
-	ModelGPT4Turbo       = "gpt-4-turbo"
-	ModelGPT35Turbo      = "gpt-3.5-turbo"
-	
+	ModelGPT4o      = "gpt-4o"
+	ModelGPT4oMini  = "gpt-4o-mini"
+	ModelGPT4Turbo  = "gpt-4-turbo"
+	ModelGPT35Turbo = "gpt-3.5-turbo"
+
 	// Claude Models
-	ModelClaude3Opus     = "claude-3-opus-20240229"
-	ModelClaude3Sonnet   = "claude-3-sonnet-20240229"
-	ModelClaude3Haiku    = "claude-3-haiku-20240307"
-	ModelClaudeSonnet4   = "claude-sonnet-4-20250514"
-	
+	ModelClaude3Opus   = "claude-3-opus-20240229"
+	ModelClaude3Sonnet = "claude-3-sonnet-20240229"
+	ModelClaude3Haiku  = "claude-3-haiku-20240307"
+	ModelClaudeSonnet4 = "claude-sonnet-4-20250514"
+
 	// Bedrock Models (these would be the actual Bedrock model IDs)
 	ModelBedrockClaude3Opus   = "anthropic.claude-3-opus-20240229-v1:0"
 	ModelBedrockClaude3Sonnet = "anthropic.claude-3-sonnet-20240229-v1:0"
@@ -133,25 +132,25 @@ const (
 func GetModelInfo(modelID string) *ModelInfo {
 	modelMap := map[string]ModelInfo{
 		ModelGPT4o: {
-			ID: ModelGPT4o,
-			Provider: ProviderNameOpenAI,
-			Name: "GPT-4o",
+			ID:        ModelGPT4o,
+			Provider:  ProviderNameOpenAI,
+			Name:      "GPT-4o",
 			MaxTokens: 128000,
 		},
 		ModelClaude3Opus: {
-			ID: ModelClaude3Opus,
-			Provider: ProviderNameAnthropic,
-			Name: "Claude 3 Opus",
+			ID:        ModelClaude3Opus,
+			Provider:  ProviderNameAnthropic,
+			Name:      "Claude 3 Opus",
 			MaxTokens: 200000,
 		},
 		ModelBedrockClaude3Sonnet: {
-			ID: ModelBedrockClaude3Sonnet,
-			Provider: ProviderNameBedrock,
-			Name: "Claude 3 Sonnet (Bedrock)",
+			ID:        ModelBedrockClaude3Sonnet,
+			Provider:  ProviderNameBedrock,
+			Name:      "Claude 3 Sonnet (Bedrock)",
 			MaxTokens: 200000,
 		},
 	}
-	
+
 	if info, exists := modelMap[modelID]; exists {
 		return &info
 	}

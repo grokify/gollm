@@ -125,7 +125,7 @@ func (s *openAIStreamAdapter) Recv() (*ChatCompletionChunk, error) {
 		Created: chunk.Created,
 		Model:   chunk.Model,
 	}
-	
+
 	if chunk.Usage != nil {
 		result.Usage = &Usage{
 			PromptTokens:     chunk.Usage.PromptTokens,

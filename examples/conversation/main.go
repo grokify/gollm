@@ -44,16 +44,16 @@ func runConversation() error {
 
 	for scanner.Scan() {
 		input := strings.TrimSpace(scanner.Text())
-		
+
 		if input == "" {
 			fmt.Print("You: ")
 			continue
 		}
-		
+
 		if input == "quit" {
 			break
 		}
-		
+
 		if input == "switch" {
 			// Switch to next provider
 			client.Close()
@@ -110,7 +110,7 @@ func runConversation() error {
 
 func createClient(provider gollm.ProviderName) (*gollm.ChatClient, error) {
 	config := gollm.ClientConfig{Provider: provider}
-	
+
 	switch provider {
 	case gollm.ProviderNameOpenAI:
 		config.APIKey = os.Getenv("OPENAI_API_KEY")
@@ -119,7 +119,7 @@ func createClient(provider gollm.ProviderName) (*gollm.ChatClient, error) {
 	case gollm.ProviderNameBedrock:
 		config.Region = "us-east-1"
 	}
-	
+
 	return gollm.NewClient(config)
 }
 

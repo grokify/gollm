@@ -16,10 +16,10 @@ type Message struct {
 
 // Response represents a Bedrock API response
 type Response struct {
-	ID      string  `json:"id"`
-	Content string  `json:"content"`
-	Model   string  `json:"model"`
-	Usage   Usage   `json:"usage"`
+	ID      string `json:"id"`
+	Content string `json:"content"`
+	Model   string `json:"model"`
+	Usage   Usage  `json:"usage"`
 }
 
 // Usage represents token usage in Bedrock response

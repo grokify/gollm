@@ -13,7 +13,7 @@ type ChatClient struct {
 type ChatCompletionStream interface {
 	// Recv receives the next chunk from the stream
 	Recv() (*ChatCompletionChunk, error)
-	
+
 	// Close closes the stream
 	Close() error
 }
@@ -24,7 +24,7 @@ type ClientConfig struct {
 	APIKey   string
 	BaseURL  string
 	Region   string // For AWS Bedrock
-	
+
 	// Provider-specific configurations can be added here
 	Extra map[string]interface{}
 }
