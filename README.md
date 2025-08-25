@@ -315,14 +315,9 @@ if err != nil {
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
-
-- [OpenAI Go SDK](https://github.com/openai/openai-go) for API patterns and inspiration
-- AWS SDK for Go v2 for Bedrock integration
-- The Go community for excellent HTTP and JSON libraries
-
 ## 🔗 Related Projects
 
+- [Anthropic Go SDK](https://github.com/anthropics/anthropic-sdk-go) - Official Anthropic SDK
 - [OpenAI Go SDK](https://github.com/openai/openai-go) - Official OpenAI SDK
 - [AWS SDK for Go](https://github.com/aws/aws-sdk-go-v2) - Official AWS SDK
 
