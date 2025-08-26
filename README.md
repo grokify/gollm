@@ -13,6 +13,7 @@ GoLLM is a unified Go SDK that provides a consistent interface for interacting w
 - **🔌 Multi-Provider Support**: OpenAI, Anthropic (Claude), and AWS Bedrock
 - **🎯 Unified API**: Same interface across all providers
 - **📡 Streaming Support**: Real-time response streaming
+- **🧠 Conversation Memory**: Persistent conversation history using Key-Value Stores
 - **🧪 Testable**: Clean interfaces that can be easily mocked
 - **🔧 Extensible**: Easy to add new LLM providers
 - **📦 Modular**: Provider-specific implementations in separate packages
@@ -26,6 +27,7 @@ gollm/
 ├── provider.go        # Provider interface definition  
 ├── providers.go       # Provider adapters (bridge pattern)
 ├── types.go          # Unified types for all providers
+├── memory.go         # Conversation memory management
 ├── errors.go         # Unified error handling
 └── providers/        # Separate provider packages
     ├── openai/       # OpenAI-specific implementation
@@ -159,6 +161,85 @@ for {
 fmt.Println()
 ```
 
+## 🧠 Conversation Memory
+
+GoLLM supports persistent conversation memory using any Key-Value Store that implements the [Sogo KVS interface](https://github.com/grokify/sogo/blob/master/database/kvs/definitions.go). This enables multi-turn conversations that persist across application restarts.
+
+### Memory Configuration
+
+```go
+// Configure memory settings
+memoryConfig := gollm.MemoryConfig{
+    MaxMessages: 50,                    // Keep last 50 messages per session
+    TTL:         24 * time.Hour,       // Messages expire after 24 hours
+    KeyPrefix:   "myapp:conversations", // Custom key prefix
+}
+
+// Create client with memory (using Redis, DynamoDB, etc.)
+client, err := gollm.NewClient(gollm.ClientConfig{
+    Provider:     gollm.ProviderNameOpenAI,
+    APIKey:       "your-api-key",
+    Memory:       kvsClient,          // Your KVS implementation
+    MemoryConfig: &memoryConfig,
+})
+```
+
+### Memory-Aware Completions
+
+```go
+// Create a session with system message
+err = client.CreateConversationWithSystemMessage(ctx, "user-123", 
+    "You are a helpful assistant that remembers our conversation history.")
+
+// Use memory-aware completion - automatically loads conversation history
+response, err := client.CreateChatCompletionWithMemory(ctx, "user-123", &gollm.ChatCompletionRequest{
+    Model: gollm.ModelGPT4o,
+    Messages: []gollm.Message{
+        {Role: gollm.RoleUser, Content: "What did we discuss last time?"},
+    },
+    MaxTokens: &[]int{200}[0],
+})
+
+// The response will include context from previous conversations in this session
+```
+
+### Memory Management
+
+```go
+// Load conversation history
+conversation, err := client.LoadConversation(ctx, "user-123")
+
+// Get just the messages
+messages, err := client.GetConversationMessages(ctx, "user-123")
+
+// Manually append messages
+err = client.AppendMessage(ctx, "user-123", gollm.Message{
+    Role:    gollm.RoleUser,
+    Content: "Remember this important fact: I prefer JSON responses.",
+})
+
+// Delete conversation
+err = client.DeleteConversation(ctx, "user-123")
+```
+
+### KVS Backend Support
+
+Memory works with any KVS implementation:
+- **Redis**: For high-performance, distributed memory
+- **DynamoDB**: For AWS-native storage
+- **In-Memory**: For testing and development
+- **Custom**: Any implementation of the Sogo KVS interface
+
+```go
+// Example with Redis (using a hypothetical Redis KVS implementation)
+redisKVS := redis.NewKVSClient("localhost:6379")
+client, err := gollm.NewClient(gollm.ClientConfig{
+    Provider: gollm.ProviderNameOpenAI,
+    APIKey:   "your-key",
+    Memory:   redisKVS,
+})
+```
+
 ## 🔄 Provider Switching
 
 The unified interface makes it easy to switch between providers:
@@ -226,6 +307,7 @@ The repository includes comprehensive examples:
 - **Basic Usage**: Simple chat completions with each provider
 - **Streaming**: Real-time response handling
 - **Conversation**: Multi-turn conversations with context
+- **Memory Demo**: Persistent conversation memory with KVS backend
 - **Architecture Demo**: Overview of the provider architecture
 
 Run examples:
@@ -233,6 +315,7 @@ Run examples:
 go run examples/basic/main.go
 go run examples/streaming/main.go
 go run examples/conversation/main.go
+go run examples/memory_demo/main.go
 go run examples/providers_demo/main.go
 ```
 

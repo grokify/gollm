@@ -6,6 +6,7 @@ require (
 	github.com/aws/aws-sdk-go-v2 v1.38.1
 	github.com/aws/aws-sdk-go-v2/config v1.31.2
 	github.com/aws/aws-sdk-go-v2/service/bedrockruntime v1.37.1
+	github.com/grokify/sogo v0.12.0
 )
 
 require (
