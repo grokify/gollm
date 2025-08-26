@@ -23,9 +23,9 @@ GoLLM is a unified Go SDK that provides a consistent interface for interacting w
 
 ```
 gollm/
-├── client.go          # Main ChatClient wrapper
-├── provider.go        # Provider interface definition  
-├── providers.go       # Provider adapters (bridge pattern)
+├── client.go         # Main ChatClient wrapper
+├── provider.go       # Provider interface definition  
+├── providers.go      # Provider adapters (bridge pattern)
 ├── types.go          # Unified types for all providers
 ├── memory.go         # Conversation memory management
 ├── errors.go         # Unified error handling
