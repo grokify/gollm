@@ -1,8 +1,8 @@
 package gollm
 
 const (
-	EnvVarAnthropicAPIKey = "ANTHROPIC_API_KEY"
-	EnvVarOpenAIAPIKey    = "OPENAI_API_KEY"
+	EnvVarAnthropicAPIKey = "ANTHROPIC_API_KEY" // #nosec G101
+	EnvVarOpenAIAPIKey    = "OPENAI_API_KEY"    // #nosec G101
 )
 
 // Common model constants for each provider
