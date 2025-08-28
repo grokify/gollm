@@ -5,7 +5,7 @@ go 1.24.5
 require (
 	github.com/aws/aws-sdk-go-v2/config v1.31.4
 	github.com/aws/aws-sdk-go-v2/service/bedrockruntime v1.37.2
-	github.com/grokify/sogo v0.12.0
+	github.com/grokify/sogo v0.12.1
 )
 
 require (
