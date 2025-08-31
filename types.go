@@ -129,6 +129,24 @@ func GetModelInfo(modelID string) *ModelInfo {
 			Name:      "Claude 3 Sonnet (Bedrock)",
 			MaxTokens: 200000,
 		},
+		ModelOllamaLlama3_8B: {
+			ID:        ModelOllamaLlama3_8B,
+			Provider:  ProviderNameOllama,
+			Name:      "Llama 3 8B",
+			MaxTokens: 8192,
+		},
+		ModelOllamaMistral7B: {
+			ID:        ModelOllamaMistral7B,
+			Provider:  ProviderNameOllama,
+			Name:      "Mistral 7B",
+			MaxTokens: 32768,
+		},
+		ModelOllamaCodeLlama: {
+			ID:        ModelOllamaCodeLlama,
+			Provider:  ProviderNameOllama,
+			Name:      "CodeLlama 13B",
+			MaxTokens: 16384,
+		},
 	}
 
 	if info, exists := modelMap[modelID]; exists {

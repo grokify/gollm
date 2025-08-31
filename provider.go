@@ -24,4 +24,5 @@ const (
 	ProviderNameOpenAI    ProviderName = "openai"
 	ProviderNameAnthropic ProviderName = "anthropic"
 	ProviderNameBedrock   ProviderName = "bedrock"
+	ProviderNameOllama    ProviderName = "ollama"
 )

@@ -28,4 +28,15 @@ const (
 
 	// Vertex AI Models
 	ModelVertexClaudeOpus4 = "claude-opus-4@20250514"
+
+	// Ollama Models (popular models that run well on Apple Silicon)
+	ModelOllamaLlama3_8B   = "llama3:8b"
+	ModelOllamaLlama3_70B  = "llama3:70b"
+	ModelOllamaMistral7B   = "mistral:7b"
+	ModelOllamaMixtral8x7B = "mixtral:8x7b"
+	ModelOllamaCodeLlama   = "codellama:13b"
+	ModelOllamaGemma2B     = "gemma:2b"
+	ModelOllamaGemma7B     = "gemma:7b"
+	ModelOllamaQwen2_5     = "qwen2.5:7b"
+	ModelOllamaDeepSeek    = "deepseek-coder:6.7b"
 )

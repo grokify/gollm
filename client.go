@@ -50,6 +50,8 @@ func NewClient(config ClientConfig) (*ChatClient, error) {
 		provider, err = newAnthropicProvider(config)
 	case ProviderNameBedrock:
 		provider, err = newBedrockProvider(config)
+	case ProviderNameOllama:
+		provider, err = newOllamaProvider(config)
 	default:
 		return nil, ErrUnsupportedProvider
 	}

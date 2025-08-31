@@ -7,6 +7,7 @@ import (
 
 	"github.com/grokify/gollm/providers/anthropic"
 	"github.com/grokify/gollm/providers/bedrock"
+	"github.com/grokify/gollm/providers/ollama"
 	"github.com/grokify/gollm/providers/openai"
 )
 
@@ -273,4 +274,167 @@ func (p *bedrockProvider) CreateChatCompletionStream(ctx context.Context, req *C
 
 func (p *bedrockProvider) Close() error {
 	return p.client.Close()
+}
+
+// Ollama Provider Adapter
+type ollamaProvider struct {
+	client *ollama.Client
+}
+
+func newOllamaProvider(config ClientConfig) (Provider, error) {
+	client := ollama.New(config.BaseURL)
+	return &ollamaProvider{client: client}, nil
+}
+
+func (p *ollamaProvider) Name() string {
+	return p.client.Name()
+}
+
+func (p *ollamaProvider) CreateChatCompletion(ctx context.Context, req *ChatCompletionRequest) (*ChatCompletionResponse, error) {
+	// Convert from unified format to Ollama format
+	ollamaReq := &ollama.Request{
+		Model: req.Model,
+	}
+
+	// Set options if provided
+	if req.MaxTokens != nil || req.Temperature != nil || req.TopP != nil || len(req.Stop) > 0 {
+		ollamaReq.Options = &ollama.Options{
+			Temperature: req.Temperature,
+			TopP:        req.TopP,
+			Stop:        req.Stop,
+		}
+		if req.MaxTokens != nil {
+			ollamaReq.Options.NumPredict = req.MaxTokens
+		}
+	}
+
+	// Convert messages
+	for _, msg := range req.Messages {
+		ollamaReq.Messages = append(ollamaReq.Messages, ollama.Message{
+			Role:    string(msg.Role),
+			Content: msg.Content,
+		})
+	}
+
+	resp, err := p.client.CreateCompletion(ctx, ollamaReq)
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert back to unified format
+	return &ChatCompletionResponse{
+		ID:      fmt.Sprintf("ollama-%d", time.Now().Unix()),
+		Object:  "chat.completion",
+		Created: time.Now().Unix(),
+		Model:   resp.Model,
+		Choices: []ChatCompletionChoice{
+			{
+				Index: 0,
+				Message: Message{
+					Role:    Role(resp.Message.Role),
+					Content: resp.Message.Content,
+				},
+				FinishReason: func() *string {
+					if resp.Done {
+						reason := "stop"
+						return &reason
+					}
+					return nil
+				}(),
+			},
+		},
+		Usage: Usage{
+			PromptTokens:     resp.PromptEvalCount,
+			CompletionTokens: resp.EvalCount,
+			TotalTokens:      resp.PromptEvalCount + resp.EvalCount,
+		},
+	}, nil
+}
+
+func (p *ollamaProvider) CreateChatCompletionStream(ctx context.Context, req *ChatCompletionRequest) (ChatCompletionStream, error) {
+	// Convert from unified format to Ollama format
+	ollamaReq := &ollama.Request{
+		Model: req.Model,
+	}
+
+	// Set options if provided
+	if req.MaxTokens != nil || req.Temperature != nil || req.TopP != nil || len(req.Stop) > 0 {
+		ollamaReq.Options = &ollama.Options{
+			Temperature: req.Temperature,
+			TopP:        req.TopP,
+			Stop:        req.Stop,
+		}
+		if req.MaxTokens != nil {
+			ollamaReq.Options.NumPredict = req.MaxTokens
+		}
+	}
+
+	// Convert messages
+	for _, msg := range req.Messages {
+		ollamaReq.Messages = append(ollamaReq.Messages, ollama.Message{
+			Role:    string(msg.Role),
+			Content: msg.Content,
+		})
+	}
+
+	stream, err := p.client.CreateCompletionStream(ctx, ollamaReq)
+	if err != nil {
+		return nil, err
+	}
+
+	return &ollamaStreamAdapter{stream: stream}, nil
+}
+
+func (p *ollamaProvider) Close() error {
+	return p.client.Close()
+}
+
+// Ollama Stream Adapter
+type ollamaStreamAdapter struct {
+	stream *ollama.Stream
+}
+
+func (s *ollamaStreamAdapter) Recv() (*ChatCompletionChunk, error) {
+	chunk, err := s.stream.Recv()
+	if err != nil {
+		return nil, err
+	}
+
+	// Convert to unified format
+	result := &ChatCompletionChunk{
+		ID:      fmt.Sprintf("ollama-stream-%d", time.Now().Unix()),
+		Object:  "chat.completion.chunk",
+		Created: time.Now().Unix(),
+		Model:   chunk.Model,
+		Choices: []ChatCompletionChoice{
+			{
+				Index: 0,
+				Delta: &Message{
+					Role:    Role(chunk.Message.Role),
+					Content: chunk.Message.Content,
+				},
+				FinishReason: func() *string {
+					if chunk.Done {
+						reason := "stop"
+						return &reason
+					}
+					return nil
+				}(),
+			},
+		},
+	}
+
+	if chunk.Done && chunk.EvalCount > 0 {
+		result.Usage = &Usage{
+			PromptTokens:     chunk.PromptEvalCount,
+			CompletionTokens: chunk.EvalCount,
+			TotalTokens:      chunk.PromptEvalCount + chunk.EvalCount,
+		}
+	}
+
+	return result, nil
+}
+
+func (s *ollamaStreamAdapter) Close() error {
+	return s.stream.Close()
 }

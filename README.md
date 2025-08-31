@@ -10,7 +10,7 @@ GoLLM is a unified Go SDK that provides a consistent interface for interacting w
 
 ## ✨ Features
 
-- **🔌 Multi-Provider Support**: OpenAI, Anthropic (Claude), and AWS Bedrock
+- **🔌 Multi-Provider Support**: OpenAI, Anthropic (Claude), AWS Bedrock, and Ollama
 - **🎯 Unified API**: Same interface across all providers
 - **📡 Streaming Support**: Real-time response streaming
 - **🧠 Conversation Memory**: Persistent conversation history using Key-Value Stores
@@ -122,6 +122,17 @@ client, err := gollm.NewClient(gollm.ClientConfig{
 client, err := gollm.NewClient(gollm.ClientConfig{
     Provider: gollm.ProviderNameBedrock,
     Region:   "us-east-1", // AWS region
+})
+```
+
+### Ollama (Local Models)
+- **Models**: Llama 3, Mistral, CodeLlama, Gemma, Qwen2.5, DeepSeek-Coder
+- **Features**: Local inference, no API keys required, optimized for Apple Silicon
+
+```go
+client, err := gollm.NewClient(gollm.ClientConfig{
+    Provider: gollm.ProviderNameOllama,
+    BaseURL:  "http://localhost:11434", // default Ollama endpoint
 })
 ```
 
@@ -317,6 +328,8 @@ go run examples/streaming/main.go
 go run examples/conversation/main.go
 go run examples/memory_demo/main.go
 go run examples/providers_demo/main.go
+go run examples/ollama/main.go
+go run examples/ollama_streaming/main.go
 ```
 
 ## 🔧 Configuration
@@ -371,6 +384,7 @@ func (c *Client) CreateCompletion(ctx context.Context, req *Request) (*Response,
 | OpenAI | GPT-4o, GPT-4o-mini, GPT-4-turbo, GPT-3.5-turbo | Chat, Streaming, Functions |
 | Anthropic | Claude-3-Opus, Claude-3-Sonnet, Claude-3-Haiku | Chat, Streaming, System messages |
 | Bedrock | Claude models, Titan models | Chat, Multiple model families |
+| Ollama | Llama 3, Mistral, CodeLlama, Gemma, Qwen2.5 | Chat, Streaming, Local inference |
 
 ## 🚨 Error Handling
 
