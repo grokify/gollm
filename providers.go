@@ -281,7 +281,7 @@ type ollamaProvider struct {
 	client *ollama.Client
 }
 
-func newOllamaProvider(config ClientConfig) (Provider, error) {
+func newOllamaProvider(config ClientConfig) (Provider, error) { //nolint:unparam // `error` added to fulfill interface requirements
 	client := ollama.New(config.BaseURL)
 	return &ollamaProvider{client: client}, nil
 }
