@@ -17,24 +17,51 @@ GoLLM is a unified Go SDK that provides a consistent interface for interacting w
 - **🧪 Testable**: Clean interfaces that can be easily mocked
 - **🔧 Extensible**: Easy to add new LLM providers
 - **📦 Modular**: Provider-specific implementations in separate packages
+- **🏗️ Reference Architecture**: Internal providers serve as reference implementations for external providers
+- **🔌 3rd Party Friendly**: External providers can be injected without modifying core library
 - **⚡ Type Safe**: Full Go type safety with comprehensive error handling
 
 ## 🏗️ Architecture
 
+GoLLM uses a clean, modular architecture that separates concerns and enables easy extensibility:
+
 ```
 gollm/
 ├── client.go         # Main ChatClient wrapper
-├── provider.go       # Provider interface definition  
-├── providers.go      # Provider adapters (bridge pattern)
-├── types.go          # Unified types for all providers
+├── providers.go      # Factory functions for built-in providers
+├── types.go          # Type aliases for backward compatibility
 ├── memory.go         # Conversation memory management
 ├── errors.go         # Unified error handling
-└── providers/        # Separate provider packages
-    ├── anthropic/    # Anthropic-specific implementation   
-    ├── bedrock/      # AWS Bedrock-specific implementation
-    ├── ollama/       # Ollama-specific implementation
-    └── openai/       # OpenAI-specific implementation
+├── provider/         # 🎯 Public interface package for external providers
+│   ├── interface.go  # Provider interface that all providers must implement
+│   └── types.go      # Unified request/response types
+└── providers/        # 📦 Individual provider packages (reference implementations)
+    ├── openai/       # OpenAI implementation
+    │   ├── openai.go # HTTP client
+    │   ├── types.go  # OpenAI-specific types
+    │   └── adapter.go # provider.Provider implementation
+    ├── anthropic/    # Anthropic implementation
+    │   ├── anthropic.go # HTTP client
+    │   ├── types.go   # Anthropic-specific types
+    │   └── adapter.go # provider.Provider implementation
+    ├── bedrock/      # AWS Bedrock implementation
+    │   ├── bedrock.go # AWS client
+    │   ├── types.go   # Bedrock-specific types
+    │   └── adapter.go # provider.Provider implementation
+    └── ollama/       # Ollama implementation
+        ├── ollama.go # HTTP client
+        ├── types.go  # Ollama-specific types
+        └── adapter.go # provider.Provider implementation
 ```
+
+### Key Architecture Benefits
+
+- **🎯 Public Interface**: The `provider` package exports the `Provider` interface that external packages can implement
+- **🏗️ Reference Implementation**: Internal providers follow the exact same structure that external providers should use
+- **🔌 Direct Injection**: External providers are injected via `ClientConfig.CustomProvider` without modifying core code
+- **📦 Modular Design**: Each provider is self-contained with its own HTTP client, types, and adapter
+- **🧪 Testable**: Clean interfaces that can be easily mocked and tested
+- **🔧 Extensible**: New providers can be added without touching existing code
 
 ## 🚀 Quick Start
 
@@ -361,45 +388,56 @@ config := gollm.ClientConfig{
 
 ## 🏗️ Adding New Providers
 
-### Built-in Providers
-To add a built-in provider to the core library:
+### 🎯 3rd Party Providers (Recommended)
 
-1. **Create Provider Package**: `providers/newprovider/`
-2. **Implement Client**: Create client with provider-specific logic
-3. **Define Types**: Provider-specific request/response types
-4. **Create Adapter**: Add adapter in main `providers.go`
-5. **Register Provider**: Add to `ProviderName` constants
+External packages can create providers without modifying the core library. This is the recommended approach for most use cases:
 
-### 3rd Party Providers (Recommended)
-External packages can create providers without modifying the core library:
+#### Step 1: Create Your Provider Package
 
 ```go
 // In your external package (e.g., github.com/yourname/gollm-gemini)
 package gemini
 
-import "github.com/grokify/gollm"
+import (
+    "context"
+    "github.com/grokify/gollm/provider"
+)
 
-type Provider struct {
+// Step 1: HTTP Client (like providers/openai/openai.go)
+type Client struct {
     apiKey string
+    // your HTTP client implementation
 }
 
-func NewProvider(apiKey string) gollm.Provider {
-    return &Provider{apiKey: apiKey}
+func New(apiKey string) *Client {
+    return &Client{apiKey: apiKey}
 }
 
-func (p *Provider) CreateChatCompletion(ctx context.Context, req *gollm.ChatCompletionRequest) (*gollm.ChatCompletionResponse, error) {
-    // Your provider implementation
+// Step 2: Provider Adapter (like providers/openai/adapter.go)
+type Provider struct {
+    client *Client
 }
 
-func (p *Provider) CreateChatCompletionStream(ctx context.Context, req *gollm.ChatCompletionRequest) (gollm.ChatCompletionStream, error) {
+func NewProvider(apiKey string) provider.Provider {
+    return &Provider{client: New(apiKey)}
+}
+
+func (p *Provider) CreateChatCompletion(ctx context.Context, req *provider.ChatCompletionRequest) (*provider.ChatCompletionResponse, error) {
+    // Convert provider.ChatCompletionRequest to your API format
+    // Make HTTP call via p.client
+    // Convert response back to provider.ChatCompletionResponse
+}
+
+func (p *Provider) CreateChatCompletionStream(ctx context.Context, req *provider.ChatCompletionRequest) (provider.ChatCompletionStream, error) {
     // Your streaming implementation
 }
 
-func (p *Provider) Close() error { return nil }
+func (p *Provider) Close() error { return p.client.Close() }
 func (p *Provider) Name() string { return "gemini" }
 ```
 
-### Using 3rd Party Providers
+#### Step 2: Use Your Provider
+
 ```go
 import (
     "github.com/grokify/gollm"
@@ -410,15 +448,42 @@ func main() {
     // Create your custom provider
     customProvider := gemini.NewProvider("your-api-key")
     
-    // Inject it directly into gollm
+    // Inject it directly into gollm - no core modifications needed!
     client, err := gollm.NewClient(gollm.ClientConfig{
-        CustomProvider: customProvider, // Direct injection - no core modifications needed!
+        CustomProvider: customProvider,
     })
     
     // Use the same gollm API
-    response, err := client.CreateChatCompletion(ctx, request)
+    response, err := client.CreateChatCompletion(ctx, &gollm.ChatCompletionRequest{
+        Model: "gemini-pro",
+        Messages: []gollm.Message{{Role: gollm.RoleUser, Content: "Hello!"}},
+    })
 }
 ```
+
+### 🔧 Built-in Providers (For Core Contributors)
+
+To add a built-in provider to the core library, follow the same structure as existing providers:
+
+1. **Create Provider Package**: `providers/newprovider/`
+   - `newprovider.go` - HTTP client implementation
+   - `types.go` - Provider-specific request/response types
+   - `adapter.go` - `provider.Provider` interface implementation
+
+2. **Update Core Files**:
+   - Add factory function in `providers.go`
+   - Add provider constant in `constants.go`
+   - Add model constants if needed
+
+3. **Reference Implementation**: Look at any existing provider (e.g., `providers/openai/`) as they all follow the exact same pattern that external providers should use
+
+### 🎯 Why This Architecture?
+
+- **🔌 No Core Changes**: External providers don't require modifying the core library
+- **🏗️ Reference Pattern**: Internal providers demonstrate the exact structure external providers should follow
+- **🧪 Easy Testing**: Both internal and external providers use the same `provider.Provider` interface
+- **📦 Self-Contained**: Each provider manages its own HTTP client, types, and adapter logic
+- **🔧 Direct Injection**: Clean dependency injection via `ClientConfig.CustomProvider`
 
 ## 📊 Model Support
 
