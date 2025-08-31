@@ -320,6 +320,7 @@ The repository includes comprehensive examples:
 - **Conversation**: Multi-turn conversations with context
 - **Memory Demo**: Persistent conversation memory with KVS backend
 - **Architecture Demo**: Overview of the provider architecture
+- **Custom Provider**: How to create and use 3rd party providers
 
 Run examples:
 ```bash
@@ -330,6 +331,7 @@ go run examples/memory_demo/main.go
 go run examples/providers_demo/main.go
 go run examples/ollama/main.go
 go run examples/ollama_streaming/main.go
+go run examples/custom_provider/main.go
 ```
 
 ## 🔧 Configuration
@@ -354,26 +356,62 @@ config := gollm.ClientConfig{
 
 ## 🏗️ Adding New Providers
 
+### Built-in Providers
+To add a built-in provider to the core library:
+
 1. **Create Provider Package**: `providers/newprovider/`
 2. **Implement Client**: Create client with provider-specific logic
 3. **Define Types**: Provider-specific request/response types
 4. **Create Adapter**: Add adapter in main `providers.go`
 5. **Register Provider**: Add to `ProviderName` constants
 
-Example structure:
+### 3rd Party Providers (Recommended)
+External packages can create providers without modifying the core library:
+
 ```go
-// providers/newprovider/client.go
-type Client struct {
+// In your external package (e.g., github.com/yourname/gollm-gemini)
+package gemini
+
+import "github.com/grokify/gollm"
+
+type Provider struct {
     apiKey string
-    client *http.Client
 }
 
-func New(apiKey, baseURL string) *Client {
-    return &Client{apiKey: apiKey, client: &http.Client{}}
+func NewProvider(apiKey string) gollm.Provider {
+    return &Provider{apiKey: apiKey}
 }
 
-func (c *Client) CreateCompletion(ctx context.Context, req *Request) (*Response, error) {
-    // Provider-specific implementation
+func (p *Provider) CreateChatCompletion(ctx context.Context, req *gollm.ChatCompletionRequest) (*gollm.ChatCompletionResponse, error) {
+    // Your provider implementation
+}
+
+func (p *Provider) CreateChatCompletionStream(ctx context.Context, req *gollm.ChatCompletionRequest) (gollm.ChatCompletionStream, error) {
+    // Your streaming implementation
+}
+
+func (p *Provider) Close() error { return nil }
+func (p *Provider) Name() string { return "gemini" }
+```
+
+### Using 3rd Party Providers
+```go
+import (
+    "github.com/grokify/gollm"
+    "github.com/yourname/gollm-gemini"
+)
+
+func main() {
+    // Create your custom provider
+    customProvider := gemini.NewProvider("your-api-key")
+    
+    // Inject it directly into gollm
+    client, err := gollm.NewClient(gollm.ClientConfig{
+        CustomProvider: customProvider, // Direct injection - no core modifications needed!
+    })
+    
+    // Use the same gollm API
+    response, err := client.CreateChatCompletion(ctx, request)
 }
 ```
 

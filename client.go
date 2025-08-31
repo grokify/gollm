@@ -34,6 +34,9 @@ type ClientConfig struct {
 	Memory       kvs.Client
 	MemoryConfig *MemoryConfig
 
+	// Direct provider injection (for 3rd party providers)
+	CustomProvider Provider
+
 	// Provider-specific configurations can be added here
 	Extra map[string]interface{}
 }
@@ -43,21 +46,27 @@ func NewClient(config ClientConfig) (*ChatClient, error) {
 	var provider Provider
 	var err error
 
-	switch config.Provider {
-	case ProviderNameOpenAI:
-		provider, err = newOpenAIProvider(config)
-	case ProviderNameAnthropic:
-		provider, err = newAnthropicProvider(config)
-	case ProviderNameBedrock:
-		provider, err = newBedrockProvider(config)
-	case ProviderNameOllama:
-		provider, err = newOllamaProvider(config)
-	default:
-		return nil, ErrUnsupportedProvider
-	}
+	// Check for direct provider injection first
+	if config.CustomProvider != nil {
+		provider = config.CustomProvider
+	} else {
+		// Fall back to built-in providers
+		switch config.Provider {
+		case ProviderNameOpenAI:
+			provider, err = newOpenAIProvider(config)
+		case ProviderNameAnthropic:
+			provider, err = newAnthropicProvider(config)
+		case ProviderNameBedrock:
+			provider, err = newBedrockProvider(config)
+		case ProviderNameOllama:
+			provider, err = newOllamaProvider(config)
+		default:
+			return nil, ErrUnsupportedProvider
+		}
 
-	if err != nil {
-		return nil, err
+		if err != nil {
+			return nil, err
+		}
 	}
 
 	client := &ChatClient{provider: provider}
