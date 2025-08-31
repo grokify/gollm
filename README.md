@@ -30,9 +30,10 @@ gollm/
 ├── memory.go         # Conversation memory management
 ├── errors.go         # Unified error handling
 └── providers/        # Separate provider packages
-    ├── openai/       # OpenAI-specific implementation
-    ├── anthropic/    # Anthropic-specific implementation
-    └── bedrock/      # AWS Bedrock-specific implementation
+    ├── anthropic/    # Anthropic-specific implementation   
+    ├── bedrock/      # AWS Bedrock-specific implementation
+    ├── ollama/       # Ollama-specific implementation
+    └── openai/       # OpenAI-specific implementation
 ```
 
 ## 🚀 Quick Start
@@ -91,6 +92,7 @@ func main() {
 ## 🔧 Supported Providers
 
 ### OpenAI
+
 - **Models**: GPT-4o, GPT-4o-mini, GPT-4-turbo, GPT-3.5-turbo
 - **Features**: Chat completions, streaming, function calling
 
@@ -103,6 +105,7 @@ client, err := gollm.NewClient(gollm.ClientConfig{
 ```
 
 ### Anthropic (Claude)
+
 - **Models**: Claude-3-Opus, Claude-3-Sonnet, Claude-3-Haiku, Claude-Sonnet-4
 - **Features**: Chat completions with system message support
 
@@ -115,6 +118,7 @@ client, err := gollm.NewClient(gollm.ClientConfig{
 ```
 
 ### AWS Bedrock
+
 - **Models**: Anthropic Claude models, Amazon Titan
 - **Features**: AWS IAM-based authentication, multiple model families
 
@@ -126,6 +130,7 @@ client, err := gollm.NewClient(gollm.ClientConfig{
 ```
 
 ### Ollama (Local Models)
+
 - **Models**: Llama 3, Mistral, CodeLlama, Gemma, Qwen2.5, DeepSeek-Coder
 - **Features**: Local inference, no API keys required, optimized for Apple Silicon
 
