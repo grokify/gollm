@@ -76,12 +76,12 @@ func NewClient(config ClientConfig) (*ChatClient, error) {
 }
 
 // CreateChatCompletion creates a chat completion
-func (c *ChatClient) CreateChatCompletion(ctx context.Context, req *ChatCompletionRequest) (*ChatCompletionResponse, error) {
+func (c *ChatClient) CreateChatCompletion(ctx context.Context, req *provider.ChatCompletionRequest) (*provider.ChatCompletionResponse, error) {
 	return c.provider.CreateChatCompletion(ctx, req)
 }
 
 // CreateChatCompletionStream creates a streaming chat completion
-func (c *ChatClient) CreateChatCompletionStream(ctx context.Context, req *ChatCompletionRequest) (ChatCompletionStream, error) {
+func (c *ChatClient) CreateChatCompletionStream(ctx context.Context, req *provider.ChatCompletionRequest) (provider.ChatCompletionStream, error) {
 	return c.provider.CreateChatCompletionStream(ctx, req)
 }
 
@@ -106,7 +106,7 @@ func (c *ChatClient) HasMemory() bool {
 }
 
 // CreateChatCompletionWithMemory creates a chat completion using conversation memory
-func (c *ChatClient) CreateChatCompletionWithMemory(ctx context.Context, sessionID string, req *ChatCompletionRequest) (*ChatCompletionResponse, error) {
+func (c *ChatClient) CreateChatCompletionWithMemory(ctx context.Context, sessionID string, req *provider.ChatCompletionRequest) (*provider.ChatCompletionResponse, error) {
 	if !c.HasMemory() {
 		return c.CreateChatCompletion(ctx, req)
 	}
@@ -145,7 +145,7 @@ func (c *ChatClient) CreateChatCompletionWithMemory(ctx context.Context, session
 }
 
 // CreateChatCompletionStreamWithMemory creates a streaming chat completion using conversation memory
-func (c *ChatClient) CreateChatCompletionStreamWithMemory(ctx context.Context, sessionID string, req *ChatCompletionRequest) (ChatCompletionStream, error) {
+func (c *ChatClient) CreateChatCompletionStreamWithMemory(ctx context.Context, sessionID string, req *provider.ChatCompletionRequest) (provider.ChatCompletionStream, error) {
 	if !c.HasMemory() {
 		return c.CreateChatCompletionStream(ctx, req)
 	}
@@ -196,7 +196,7 @@ func (c *ChatClient) SaveConversation(ctx context.Context, conversation *Convers
 }
 
 // AppendMessage appends a message to a conversation in memory
-func (c *ChatClient) AppendMessage(ctx context.Context, sessionID string, message Message) error {
+func (c *ChatClient) AppendMessage(ctx context.Context, sessionID string, message provider.Message) error {
 	if !c.HasMemory() {
 		return fmt.Errorf("memory not configured")
 	}
@@ -204,7 +204,7 @@ func (c *ChatClient) AppendMessage(ctx context.Context, sessionID string, messag
 }
 
 // GetConversationMessages retrieves messages from a conversation
-func (c *ChatClient) GetConversationMessages(ctx context.Context, sessionID string) ([]Message, error) {
+func (c *ChatClient) GetConversationMessages(ctx context.Context, sessionID string) ([]provider.Message, error) {
 	if !c.HasMemory() {
 		return nil, fmt.Errorf("memory not configured")
 	}
@@ -229,10 +229,10 @@ func (c *ChatClient) DeleteConversation(ctx context.Context, sessionID string) e
 
 // memoryAwareStream wraps a ChatCompletionStream to capture responses for memory storage
 type memoryAwareStream struct {
-	stream      ChatCompletionStream
+	stream      provider.ChatCompletionStream
 	memory      *MemoryManager
 	sessionID   string
-	reqMessages []Message
+	reqMessages []provider.Message
 	ctx         context.Context
 
 	// Buffer to collect the complete response
@@ -241,7 +241,7 @@ type memoryAwareStream struct {
 }
 
 // Recv receives the next chunk from the stream and buffers the response
-func (s *memoryAwareStream) Recv() (*ChatCompletionChunk, error) {
+func (s *memoryAwareStream) Recv() (*provider.ChatCompletionChunk, error) {
 	chunk, err := s.stream.Recv()
 	if err != nil {
 		// If we hit EOF and haven't saved the response yet, save it now
@@ -273,8 +273,8 @@ func (s *memoryAwareStream) Close() error {
 func (s *memoryAwareStream) saveBufferedResponse() {
 	if s.responseBuffer.Len() > 0 {
 		// Create assistant message from buffered response
-		assistantMessage := Message{
-			Role:    RoleAssistant,
+		assistantMessage := provider.Message{
+			Role:    provider.RoleAssistant,
 			Content: s.responseBuffer.String(),
 		}
 

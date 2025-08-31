@@ -55,22 +55,22 @@ func (p *openAIProvider) CreateChatCompletion(ctx context.Context, req *provider
 	}
 
 	// Convert back to unified format
-	return &ChatCompletionResponse{
+	return &provider.ChatCompletionResponse{
 		ID:      resp.ID,
 		Object:  resp.Object,
 		Created: resp.Created,
 		Model:   resp.Model,
-		Choices: []ChatCompletionChoice{
+		Choices: []provider.ChatCompletionChoice{
 			{
 				Index: 0,
-				Message: Message{
-					Role:    Role(resp.Choices[0].Message.Role),
+				Message: provider.Message{
+					Role:    provider.Role(resp.Choices[0].Message.Role),
 					Content: resp.Choices[0].Message.Content,
 				},
 				FinishReason: resp.Choices[0].FinishReason,
 			},
 		},
-		Usage: Usage{
+		Usage: provider.Usage{
 			PromptTokens:     resp.Usage.PromptTokens,
 			CompletionTokens: resp.Usage.CompletionTokens,
 			TotalTokens:      resp.Usage.TotalTokens,
@@ -78,7 +78,7 @@ func (p *openAIProvider) CreateChatCompletion(ctx context.Context, req *provider
 	}, nil
 }
 
-func (p *openAIProvider) CreateChatCompletionStream(ctx context.Context, req *ChatCompletionRequest) (ChatCompletionStream, error) {
+func (p *openAIProvider) CreateChatCompletionStream(ctx context.Context, req *provider.ChatCompletionRequest) (provider.ChatCompletionStream, error) {
 	// Convert from unified format to OpenAI format
 	openaiReq := &openai.Request{
 		Model:       req.Model,
@@ -114,14 +114,14 @@ type openAIStreamAdapter struct {
 	stream *openai.Stream
 }
 
-func (s *openAIStreamAdapter) Recv() (*ChatCompletionChunk, error) {
+func (s *openAIStreamAdapter) Recv() (*provider.ChatCompletionChunk, error) {
 	chunk, err := s.stream.Recv()
 	if err != nil {
 		return nil, err
 	}
 
 	// Convert to unified format
-	result := &ChatCompletionChunk{
+	result := &provider.ChatCompletionChunk{
 		ID:      chunk.ID,
 		Object:  chunk.Object,
 		Created: chunk.Created,
@@ -129,7 +129,7 @@ func (s *openAIStreamAdapter) Recv() (*ChatCompletionChunk, error) {
 	}
 
 	if chunk.Usage != nil {
-		result.Usage = &Usage{
+		result.Usage = &provider.Usage{
 			PromptTokens:     chunk.Usage.PromptTokens,
 			CompletionTokens: chunk.Usage.CompletionTokens,
 			TotalTokens:      chunk.Usage.TotalTokens,
@@ -137,13 +137,13 @@ func (s *openAIStreamAdapter) Recv() (*ChatCompletionChunk, error) {
 	}
 
 	for _, choice := range chunk.Choices {
-		result.Choices = append(result.Choices, ChatCompletionChoice{
+		result.Choices = append(result.Choices, provider.ChatCompletionChoice{
 			Index:        choice.Index,
 			FinishReason: choice.FinishReason,
 		})
 		if choice.Delta != nil {
-			result.Choices[len(result.Choices)-1].Delta = &Message{
-				Role:    Role(choice.Delta.Role),
+			result.Choices[len(result.Choices)-1].Delta = &provider.Message{
+				Role:    provider.Role(choice.Delta.Role),
 				Content: choice.Delta.Content,
 			}
 		}
@@ -174,7 +174,7 @@ func (p *anthropicProvider) Name() string {
 	return p.client.Name()
 }
 
-func (p *anthropicProvider) CreateChatCompletion(ctx context.Context, req *ChatCompletionRequest) (*ChatCompletionResponse, error) {
+func (p *anthropicProvider) CreateChatCompletion(ctx context.Context, req *provider.ChatCompletionRequest) (*provider.ChatCompletionResponse, error) {
 	// Convert from unified format to Anthropic format
 	anthropicReq := &anthropic.Request{
 		Model:       req.Model,
@@ -191,9 +191,9 @@ func (p *anthropicProvider) CreateChatCompletion(ctx context.Context, req *ChatC
 	var systemMessage string
 	for _, msg := range req.Messages {
 		switch msg.Role {
-		case RoleSystem:
+		case provider.RoleSystem:
 			systemMessage = msg.Content
-		case RoleUser, RoleAssistant:
+		case provider.RoleUser, provider.RoleAssistant:
 			anthropicReq.Messages = append(anthropicReq.Messages, anthropic.Message{
 				Role:    string(msg.Role),
 				Content: msg.Content,
@@ -216,22 +216,22 @@ func (p *anthropicProvider) CreateChatCompletion(ctx context.Context, req *ChatC
 		content = resp.Content[0].Text
 	}
 
-	return &ChatCompletionResponse{
+	return &provider.ChatCompletionResponse{
 		ID:      resp.ID,
 		Object:  "chat.completion",
 		Created: time.Now().Unix(),
 		Model:   resp.Model,
-		Choices: []ChatCompletionChoice{
+		Choices: []provider.ChatCompletionChoice{
 			{
 				Index: 0,
-				Message: Message{
-					Role:    RoleAssistant,
+				Message: provider.Message{
+					Role:    provider.RoleAssistant,
 					Content: content,
 				},
 				FinishReason: &resp.StopReason,
 			},
 		},
-		Usage: Usage{
+		Usage: provider.Usage{
 			PromptTokens:     resp.Usage.InputTokens,
 			CompletionTokens: resp.Usage.OutputTokens,
 			TotalTokens:      resp.Usage.InputTokens + resp.Usage.OutputTokens,
@@ -239,7 +239,7 @@ func (p *anthropicProvider) CreateChatCompletion(ctx context.Context, req *ChatC
 	}, nil
 }
 
-func (p *anthropicProvider) CreateChatCompletionStream(ctx context.Context, req *ChatCompletionRequest) (ChatCompletionStream, error) {
+func (p *anthropicProvider) CreateChatCompletionStream(ctx context.Context, req *provider.ChatCompletionRequest) (provider.ChatCompletionStream, error) {
 	return nil, fmt.Errorf("anthropic streaming not implemented in this demo")
 }
 
@@ -265,11 +265,11 @@ func (p *bedrockProvider) Name() string {
 	return p.client.Name()
 }
 
-func (p *bedrockProvider) CreateChatCompletion(ctx context.Context, req *ChatCompletionRequest) (*ChatCompletionResponse, error) {
+func (p *bedrockProvider) CreateChatCompletion(ctx context.Context, req *provider.ChatCompletionRequest) (*provider.ChatCompletionResponse, error) {
 	return nil, fmt.Errorf("bedrock implementation not fully implemented in this demo")
 }
 
-func (p *bedrockProvider) CreateChatCompletionStream(ctx context.Context, req *ChatCompletionRequest) (ChatCompletionStream, error) {
+func (p *bedrockProvider) CreateChatCompletionStream(ctx context.Context, req *provider.ChatCompletionRequest) (provider.ChatCompletionStream, error) {
 	return nil, fmt.Errorf("bedrock streaming not implemented in this demo")
 }
 
@@ -291,7 +291,7 @@ func (p *ollamaProvider) Name() string {
 	return p.client.Name()
 }
 
-func (p *ollamaProvider) CreateChatCompletion(ctx context.Context, req *ChatCompletionRequest) (*ChatCompletionResponse, error) {
+func (p *ollamaProvider) CreateChatCompletion(ctx context.Context, req *provider.ChatCompletionRequest) (*provider.ChatCompletionResponse, error) {
 	// Convert from unified format to Ollama format
 	ollamaReq := &ollama.Request{
 		Model: req.Model,
@@ -323,16 +323,16 @@ func (p *ollamaProvider) CreateChatCompletion(ctx context.Context, req *ChatComp
 	}
 
 	// Convert back to unified format
-	return &ChatCompletionResponse{
+	return &provider.ChatCompletionResponse{
 		ID:      fmt.Sprintf("ollama-%d", time.Now().Unix()),
 		Object:  "chat.completion",
 		Created: time.Now().Unix(),
 		Model:   resp.Model,
-		Choices: []ChatCompletionChoice{
+		Choices: []provider.ChatCompletionChoice{
 			{
 				Index: 0,
-				Message: Message{
-					Role:    Role(resp.Message.Role),
+				Message: provider.Message{
+					Role:    provider.Role(resp.Message.Role),
 					Content: resp.Message.Content,
 				},
 				FinishReason: func() *string {
@@ -344,7 +344,7 @@ func (p *ollamaProvider) CreateChatCompletion(ctx context.Context, req *ChatComp
 				}(),
 			},
 		},
-		Usage: Usage{
+		Usage: provider.Usage{
 			PromptTokens:     resp.PromptEvalCount,
 			CompletionTokens: resp.EvalCount,
 			TotalTokens:      resp.PromptEvalCount + resp.EvalCount,
@@ -352,7 +352,7 @@ func (p *ollamaProvider) CreateChatCompletion(ctx context.Context, req *ChatComp
 	}, nil
 }
 
-func (p *ollamaProvider) CreateChatCompletionStream(ctx context.Context, req *ChatCompletionRequest) (ChatCompletionStream, error) {
+func (p *ollamaProvider) CreateChatCompletionStream(ctx context.Context, req *provider.ChatCompletionRequest) (provider.ChatCompletionStream, error) {
 	// Convert from unified format to Ollama format
 	ollamaReq := &ollama.Request{
 		Model: req.Model,
@@ -395,23 +395,23 @@ type ollamaStreamAdapter struct {
 	stream *ollama.Stream
 }
 
-func (s *ollamaStreamAdapter) Recv() (*ChatCompletionChunk, error) {
+func (s *ollamaStreamAdapter) Recv() (*provider.ChatCompletionChunk, error) {
 	chunk, err := s.stream.Recv()
 	if err != nil {
 		return nil, err
 	}
 
 	// Convert to unified format
-	result := &ChatCompletionChunk{
+	result := &provider.ChatCompletionChunk{
 		ID:      fmt.Sprintf("ollama-stream-%d", time.Now().Unix()),
 		Object:  "chat.completion.chunk",
 		Created: time.Now().Unix(),
 		Model:   chunk.Model,
-		Choices: []ChatCompletionChoice{
+		Choices: []provider.ChatCompletionChoice{
 			{
 				Index: 0,
-				Delta: &Message{
-					Role:    Role(chunk.Message.Role),
+				Delta: &provider.Message{
+					Role:    provider.Role(chunk.Message.Role),
 					Content: chunk.Message.Content,
 				},
 				FinishReason: func() *string {
@@ -426,7 +426,7 @@ func (s *ollamaStreamAdapter) Recv() (*ChatCompletionChunk, error) {
 	}
 
 	if chunk.Done && chunk.EvalCount > 0 {
-		result.Usage = &Usage{
+		result.Usage = &provider.Usage{
 			PromptTokens:     chunk.PromptEvalCount,
 			CompletionTokens: chunk.EvalCount,
 			TotalTokens:      chunk.PromptEvalCount + chunk.EvalCount,
