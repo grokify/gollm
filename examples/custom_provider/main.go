@@ -26,7 +26,7 @@ func (c *httpClient) Name() string {
 	return c.name
 }
 
-// Step 2: Provider Adapter (like the adapters in providers.go) 
+// Step 2: Provider Adapter (like the adapters in providers.go)
 type customProvider struct {
 	client *httpClient
 }
