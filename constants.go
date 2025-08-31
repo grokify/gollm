@@ -5,6 +5,16 @@ const (
 	EnvVarOpenAIAPIKey    = "OPENAI_API_KEY"    // #nosec G101
 )
 
+// ProviderName represents the different LLM provider names
+type ProviderName string
+
+const (
+	ProviderNameOpenAI    ProviderName = "openai"
+	ProviderNameAnthropic ProviderName = "anthropic"
+	ProviderNameBedrock   ProviderName = "bedrock"
+	ProviderNameOllama    ProviderName = "ollama"
+)
+
 // Common model constants for each provider
 const (
 	// OpenAI Models

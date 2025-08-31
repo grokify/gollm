@@ -16,13 +16,3 @@ type Provider interface {
 	// Name returns the provider name
 	Name() string
 }
-
-// ProviderName represents the different LLM provider names
-type ProviderName string
-
-const (
-	ProviderNameOpenAI    ProviderName = "openai"
-	ProviderNameAnthropic ProviderName = "anthropic"
-	ProviderNameBedrock   ProviderName = "bedrock"
-	ProviderNameOllama    ProviderName = "ollama"
-)
