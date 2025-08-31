@@ -22,7 +22,8 @@ func main() {
 	fmt.Println("  └── providers/")
 	fmt.Println("      ├── openai/      - OpenAI implementation")
 	fmt.Println("      ├── anthropic/   - Claude implementation")
-	fmt.Println("      └── bedrock/     - AWS Bedrock implementation")
+	fmt.Println("      ├── bedrock/     - AWS Bedrock implementation")
+	fmt.Println("      └── ollama/      - Ollama local models")
 	fmt.Println()
 
 	// Demonstrate creating clients for different providers
@@ -64,6 +65,18 @@ func main() {
 		bedrockClient.Close()
 	}
 
+	// Ollama client (works locally, no credentials needed)
+	ollamaClient, err := gollm.NewClient(gollm.ClientConfig{
+		Provider: gollm.ProviderNameOllama,
+		BaseURL:  "http://localhost:11434",
+	})
+	if err != nil {
+		log.Printf("⚠️  Ollama client creation failed (is Ollama running?): %v", err)
+	} else {
+		fmt.Printf("✅ Ollama client created: %s\n", ollamaClient.Provider().Name())
+		ollamaClient.Close()
+	}
+
 	fmt.Println()
 	fmt.Println("Benefits of this architecture:")
 	fmt.Println("1. 🔌 Pluggable: Easy to add new LLM providers")
@@ -71,27 +84,37 @@ func main() {
 	fmt.Println("3. 🧪 Testable: Provider interface can be mocked")
 	fmt.Println("4. 📦 Modular: Each provider is self-contained")
 	fmt.Println("5. 🔧 Maintainable: Clear separation of concerns")
+	fmt.Println("6. 🏠 Local + Cloud: Mix local (Ollama) and cloud providers")
 
 	// Show example request structure
 	fmt.Println()
 	fmt.Println("Example unified request structure:")
-	req := &gollm.ChatCompletionRequest{
-		Model: gollm.ModelGPT4o,
+	fmt.Println("Cloud model example:")
+	cloudReq := &gollm.ChatCompletionRequest{
+		Model: gollm.ModelGPT4o, // OpenAI cloud model
 		Messages: []gollm.Message{
-			{
-				Role:    gollm.RoleSystem,
-				Content: "You are a helpful assistant.",
-			},
-			{
-				Role:    gollm.RoleUser,
-				Content: "Hello, world!",
-			},
+			{Role: gollm.RoleSystem, Content: "You are a helpful assistant."},
+			{Role: gollm.RoleUser, Content: "Hello, world!"},
 		},
 		MaxTokens:   &[]int{100}[0],
 		Temperature: &[]float64{0.7}[0],
 	}
+	fmt.Printf("  Model: %s (OpenAI)\n", cloudReq.Model)
 
-	fmt.Printf("Request: %+v\n", req)
 	fmt.Println()
-	fmt.Println("This same request structure works with all providers!")
+	fmt.Println("Local model example:")
+	localReq := &gollm.ChatCompletionRequest{
+		Model: "llama3", // Ollama local model
+		Messages: []gollm.Message{
+			{Role: gollm.RoleSystem, Content: "You are a helpful assistant."},
+			{Role: gollm.RoleUser, Content: "Hello, world!"},
+		},
+		MaxTokens:   &[]int{100}[0],
+		Temperature: &[]float64{0.7}[0],
+	}
+	fmt.Printf("  Model: %s (Ollama)\n", localReq.Model)
+
+	fmt.Println()
+	fmt.Println("🎉 The same request structure works with ALL providers!")
+	fmt.Println("   Switch from cloud to local by just changing the client config!")
 }
