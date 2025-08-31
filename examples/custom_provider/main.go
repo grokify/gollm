@@ -6,47 +6,61 @@ import (
 	"log"
 
 	"github.com/grokify/gollm"
+	"github.com/grokify/gollm/provider"
 )
 
-// Example of a 3rd party provider implementation
-// This could be in an external package like github.com/someone/gollm-custom
+// Example of a 3rd party provider implementation following gollm's internal pattern
+// This would be in an external package like github.com/someone/gollm-custom
 
-// customProvider implements the gollm.Provider interface
-type customProvider struct {
+// Step 1: HTTP Client (like providers/ollama/ollama.go)
+type httpClient struct {
 	name   string
 	apiKey string
 }
 
-// NewCustomProvider creates a new custom provider (this would be in external package)
-func NewCustomProvider(name, apiKey string) gollm.Provider {
-	return &customProvider{
-		name:   name,
-		apiKey: apiKey,
-	}
+func newHTTPClient(name, apiKey string) *httpClient {
+	return &httpClient{name: name, apiKey: apiKey}
+}
+
+func (c *httpClient) Name() string {
+	return c.name
+}
+
+// Step 2: Provider Adapter (like the adapters in providers.go) 
+type customProvider struct {
+	client *httpClient
+}
+
+// NewCustomProvider creates a new custom provider following gollm's architecture pattern
+// Note: Now uses the public provider.Provider interface that external packages can import
+func NewCustomProvider(name, apiKey string) provider.Provider {
+	client := newHTTPClient(name, apiKey)
+	return &customProvider{client: client}
 }
 
 func (p *customProvider) Name() string {
-	return p.name
+	return p.client.Name()
 }
 
-func (p *customProvider) CreateChatCompletion(ctx context.Context, req *gollm.ChatCompletionRequest) (*gollm.ChatCompletionResponse, error) {
+func (p *customProvider) CreateChatCompletion(ctx context.Context, req *provider.ChatCompletionRequest) (*provider.ChatCompletionResponse, error) {
+	// This would normally call p.client.CreateCompletion() and convert the response
 	// Mock implementation for demonstration
-	return &gollm.ChatCompletionResponse{
+	return &provider.ChatCompletionResponse{
 		ID:      "custom-123",
 		Object:  "chat.completion",
 		Created: 1234567890,
 		Model:   req.Model,
-		Choices: []gollm.ChatCompletionChoice{
+		Choices: []provider.ChatCompletionChoice{
 			{
 				Index: 0,
-				Message: gollm.Message{
-					Role:    gollm.RoleAssistant,
-					Content: fmt.Sprintf("Hello from %s! You asked: %s", p.name, req.Messages[len(req.Messages)-1].Content),
+				Message: provider.Message{
+					Role:    provider.RoleAssistant,
+					Content: fmt.Sprintf("Hello from %s! You asked: %s", p.client.Name(), req.Messages[len(req.Messages)-1].Content),
 				},
 				FinishReason: &[]string{"stop"}[0],
 			},
 		},
-		Usage: gollm.Usage{
+		Usage: provider.Usage{
 			PromptTokens:     10,
 			CompletionTokens: 20,
 			TotalTokens:      30,
@@ -54,7 +68,7 @@ func (p *customProvider) CreateChatCompletion(ctx context.Context, req *gollm.Ch
 	}, nil
 }
 
-func (p *customProvider) CreateChatCompletionStream(ctx context.Context, req *gollm.ChatCompletionRequest) (gollm.ChatCompletionStream, error) {
+func (p *customProvider) CreateChatCompletionStream(ctx context.Context, req *provider.ChatCompletionRequest) (provider.ChatCompletionStream, error) {
 	return nil, fmt.Errorf("streaming not implemented in custom provider demo")
 }
 

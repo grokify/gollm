@@ -5,22 +5,14 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/grokify/gollm/provider"
 	"github.com/grokify/sogo/database/kvs"
 )
 
 // ChatClient is the main client interface that wraps a Provider
 type ChatClient struct {
-	provider Provider
+	provider provider.Provider
 	memory   *MemoryManager
-}
-
-// ChatCompletionStream represents a streaming chat completion response
-type ChatCompletionStream interface {
-	// Recv receives the next chunk from the stream
-	Recv() (*ChatCompletionChunk, error)
-
-	// Close closes the stream
-	Close() error
 }
 
 // ClientConfig holds configuration for creating a client
@@ -35,7 +27,7 @@ type ClientConfig struct {
 	MemoryConfig *MemoryConfig
 
 	// Direct provider injection (for 3rd party providers)
-	CustomProvider Provider
+	CustomProvider provider.Provider
 
 	// Provider-specific configurations can be added here
 	Extra map[string]interface{}
@@ -43,23 +35,23 @@ type ClientConfig struct {
 
 // NewClient creates a new ChatClient based on the provider
 func NewClient(config ClientConfig) (*ChatClient, error) {
-	var provider Provider
+	var prov provider.Provider
 	var err error
 
 	// Check for direct provider injection first
 	if config.CustomProvider != nil {
-		provider = config.CustomProvider
+		prov = config.CustomProvider
 	} else {
 		// Fall back to built-in providers
 		switch config.Provider {
 		case ProviderNameOpenAI:
-			provider, err = newOpenAIProvider(config)
+			prov, err = newOpenAIProvider(config)
 		case ProviderNameAnthropic:
-			provider, err = newAnthropicProvider(config)
+			prov, err = newAnthropicProvider(config)
 		case ProviderNameBedrock:
-			provider, err = newBedrockProvider(config)
+			prov, err = newBedrockProvider(config)
 		case ProviderNameOllama:
-			provider, err = newOllamaProvider(config)
+			prov, err = newOllamaProvider(config)
 		default:
 			return nil, ErrUnsupportedProvider
 		}
@@ -69,7 +61,7 @@ func NewClient(config ClientConfig) (*ChatClient, error) {
 		}
 	}
 
-	client := &ChatClient{provider: provider}
+	client := &ChatClient{provider: prov}
 
 	// Initialize memory if provided
 	if config.Memory != nil {
@@ -99,7 +91,7 @@ func (c *ChatClient) Close() error {
 }
 
 // Provider returns the underlying provider
-func (c *ChatClient) Provider() Provider {
+func (c *ChatClient) Provider() provider.Provider {
 	return c.provider
 }
 

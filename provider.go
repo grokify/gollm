@@ -1,18 +1,9 @@
 package gollm
 
-import "context"
+import "github.com/grokify/gollm/provider"
 
-// Provider defines the interface that all LLM providers must implement
-type Provider interface {
-	// CreateChatCompletion creates a new chat completion
-	CreateChatCompletion(ctx context.Context, req *ChatCompletionRequest) (*ChatCompletionResponse, error)
+// Provider is an alias to the provider.Provider interface for backward compatibility
+type Provider = provider.Provider
 
-	// CreateChatCompletionStream creates a streaming chat completion
-	CreateChatCompletionStream(ctx context.Context, req *ChatCompletionRequest) (ChatCompletionStream, error)
-
-	// Close closes the provider and cleans up resources
-	Close() error
-
-	// Name returns the provider name
-	Name() string
-}
+// ChatCompletionStream is an alias to the provider.ChatCompletionStream interface for backward compatibility  
+type ChatCompletionStream = provider.ChatCompletionStream

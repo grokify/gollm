@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/grokify/gollm/provider"
 	"github.com/grokify/gollm/providers/anthropic"
 	"github.com/grokify/gollm/providers/bedrock"
 	"github.com/grokify/gollm/providers/ollama"
@@ -16,7 +17,7 @@ type openAIProvider struct {
 	client *openai.Client
 }
 
-func newOpenAIProvider(config ClientConfig) (Provider, error) {
+func newOpenAIProvider(config ClientConfig) (provider.Provider, error) {
 	if config.APIKey == "" {
 		return nil, ErrEmptyAPIKey
 	}
@@ -29,7 +30,7 @@ func (p *openAIProvider) Name() string {
 	return p.client.Name()
 }
 
-func (p *openAIProvider) CreateChatCompletion(ctx context.Context, req *ChatCompletionRequest) (*ChatCompletionResponse, error) {
+func (p *openAIProvider) CreateChatCompletion(ctx context.Context, req *provider.ChatCompletionRequest) (*provider.ChatCompletionResponse, error) {
 	// Convert from unified format to OpenAI format
 	openaiReq := &openai.Request{
 		Model:       req.Model,
@@ -160,7 +161,7 @@ type anthropicProvider struct {
 	client *anthropic.Client
 }
 
-func newAnthropicProvider(config ClientConfig) (Provider, error) {
+func newAnthropicProvider(config ClientConfig) (provider.Provider, error) {
 	if config.APIKey == "" {
 		return nil, ErrEmptyAPIKey
 	}
@@ -251,7 +252,7 @@ type bedrockProvider struct {
 	client *bedrock.Client
 }
 
-func newBedrockProvider(config ClientConfig) (Provider, error) {
+func newBedrockProvider(config ClientConfig) (provider.Provider, error) {
 	client, err := bedrock.New(config.Region)
 	if err != nil {
 		return nil, err
@@ -281,7 +282,7 @@ type ollamaProvider struct {
 	client *ollama.Client
 }
 
-func newOllamaProvider(config ClientConfig) (Provider, error) { //nolint:unparam // `error` added to fulfill interface requirements
+func newOllamaProvider(config ClientConfig) (provider.Provider, error) { //nolint:unparam // `error` added to fulfill interface requirements
 	client := ollama.New(config.BaseURL)
 	return &ollamaProvider{client: client}, nil
 }
