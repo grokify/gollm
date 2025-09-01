@@ -27,31 +27,31 @@ GoLLM uses a clean, modular architecture that separates concerns and enables eas
 
 ```
 gollm/
-├── client.go         # Main ChatClient wrapper
-├── providers.go      # Factory functions for built-in providers
-├── types.go          # Type aliases for backward compatibility
-├── memory.go         # Conversation memory management
-├── errors.go         # Unified error handling
-├── provider/         # 🎯 Public interface package for external providers
-│   ├── interface.go  # Provider interface that all providers must implement
-│   └── types.go      # Unified request/response types
-└── providers/        # 📦 Individual provider packages (reference implementations)
-    ├── openai/       # OpenAI implementation
-    │   ├── openai.go # HTTP client
-    │   ├── types.go  # OpenAI-specific types
-    │   └── adapter.go # provider.Provider implementation
-    ├── anthropic/    # Anthropic implementation
+├── client.go            # Main ChatClient wrapper
+├── providers.go         # Factory functions for built-in providers
+├── types.go             # Type aliases for backward compatibility
+├── memory.go            # Conversation memory management
+├── errors.go            # Unified error handling
+├── provider/            # 🎯 Public interface package for external providers
+│   ├── interface.go     # Provider interface that all providers must implement
+│   └── types.go         # Unified request/response types
+└── providers/           # 📦 Individual provider packages (reference implementations)
+    ├── openai/          # OpenAI implementation
+    │   ├── openai.go    # HTTP client
+    │   ├── types.go     # OpenAI-specific types
+    │   └── adapter.go   # provider.Provider implementation
+    ├── anthropic/       # Anthropic implementation
     │   ├── anthropic.go # HTTP client
-    │   ├── types.go   # Anthropic-specific types
-    │   └── adapter.go # provider.Provider implementation
-    ├── bedrock/      # AWS Bedrock implementation
-    │   ├── bedrock.go # AWS client
-    │   ├── types.go   # Bedrock-specific types
-    │   └── adapter.go # provider.Provider implementation
-    └── ollama/       # Ollama implementation
-        ├── ollama.go # HTTP client
-        ├── types.go  # Ollama-specific types
-        └── adapter.go # provider.Provider implementation
+    │   ├── types.go     # Anthropic-specific types
+    │   └── adapter.go   # provider.Provider implementation
+    ├── bedrock/         # AWS Bedrock implementation
+    │   ├── bedrock.go   # AWS client
+    │   ├── types.go     # Bedrock-specific types
+    │   └── adapter.go   # provider.Provider implementation
+    └── ollama/          # Ollama implementation
+        ├── ollama.go    # HTTP client
+        ├── types.go     # Ollama-specific types
+        └── adapter.go   # provider.Provider implementation
 ```
 
 ### Key Architecture Benefits
