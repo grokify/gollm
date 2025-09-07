@@ -220,7 +220,7 @@ func (s *Stream) Recv() (*Chunk, error) {
 		Model:   s.model,
 	}
 
-	if response.Candidates != nil && len(response.Candidates) > 0 {
+	if len(response.Candidates) > 0 {
 		candidate := response.Candidates[0]
 		content := ""
 
