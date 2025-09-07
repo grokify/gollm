@@ -52,6 +52,8 @@ func NewClient(config ClientConfig) (*ChatClient, error) {
 			prov, err = newBedrockProvider(config)
 		case ProviderNameOllama:
 			prov, err = newOllamaProvider(config)
+		case ProviderNameGemini:
+			prov, err = newGeminiProvider(config)
 		default:
 			return nil, ErrUnsupportedProvider
 		}

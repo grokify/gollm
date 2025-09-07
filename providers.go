@@ -4,6 +4,7 @@ import (
 	"github.com/grokify/gollm/provider"
 	"github.com/grokify/gollm/providers/anthropic"
 	"github.com/grokify/gollm/providers/bedrock"
+	"github.com/grokify/gollm/providers/gemini"
 	"github.com/grokify/gollm/providers/ollama"
 	"github.com/grokify/gollm/providers/openai"
 )
@@ -32,4 +33,12 @@ func newBedrockProvider(config ClientConfig) (provider.Provider, error) {
 // newOllamaProvider creates a new Ollama provider adapter
 func newOllamaProvider(config ClientConfig) (provider.Provider, error) { //nolint:unparam // `error` added to fulfill interface requirements
 	return ollama.NewProvider(config.BaseURL), nil
+}
+
+// newGeminiProvider creates a new Gemini provider adapter
+func newGeminiProvider(config ClientConfig) (provider.Provider, error) {
+	if config.APIKey == "" {
+		return nil, ErrEmptyAPIKey
+	}
+	return gemini.NewProvider(config.APIKey), nil
 }
