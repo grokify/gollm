@@ -5,7 +5,7 @@ go 1.24.5
 require (
 	github.com/aws/aws-sdk-go-v2/config v1.31.13
 	github.com/aws/aws-sdk-go-v2/service/bedrockruntime v1.39.0
-	github.com/grokify/sogo v0.12.7
+	github.com/grokify/sogo v0.12.9
 	google.golang.org/genai v1.23.0
 )
 
