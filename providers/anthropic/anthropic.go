@@ -2,12 +2,14 @@
 package anthropic
 
 import (
+	"bufio"
 	"bytes"
 	"context"
 	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -75,6 +77,47 @@ func (c *Client) CreateCompletion(ctx context.Context, req *Request) (*Response,
 	return &response, nil
 }
 
+// CreateCompletionStream creates a streaming chat completion
+func (c *Client) CreateCompletionStream(ctx context.Context, req *Request) (*Stream, error) {
+	if req.Model == "" {
+		return nil, fmt.Errorf("model cannot be empty")
+	}
+	if len(req.Messages) == 0 {
+		return nil, fmt.Errorf("messages cannot be empty")
+	}
+
+	// Enable streaming
+	req.Stream = boolPtr(true)
+
+	reqBody, err := json.Marshal(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal request: %w", err)
+	}
+
+	httpReq, err := http.NewRequestWithContext(ctx, "POST", c.baseURL+"/v1/messages", bytes.NewBuffer(reqBody))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create request: %w", err)
+	}
+
+	c.setHeaders(httpReq)
+	httpReq.Header.Set("Accept", "text/event-stream")
+
+	resp, err := c.client.Do(httpReq)
+	if err != nil {
+		return nil, fmt.Errorf("request failed: %w", err)
+	}
+
+	if resp.StatusCode != http.StatusOK {
+		defer resp.Body.Close()
+		return nil, c.handleErrorResponse(resp)
+	}
+
+	return &Stream{
+		response: resp,
+		scanner:  bufio.NewScanner(resp.Body),
+	}, nil
+}
+
 // Close closes the client
 func (c *Client) Close() error {
 	return nil
@@ -106,4 +149,86 @@ func (c *Client) handleErrorResponse(resp *http.Response) error {
 	}
 
 	return fmt.Errorf("Anthropic API error: %s", errorResp.Error.Message)
+}
+
+// Stream implements streaming for Anthropic
+type Stream struct {
+	response *http.Response
+	scanner  *bufio.Scanner
+	closed   bool
+}
+
+// Recv receives the next chunk from the stream
+func (s *Stream) Recv() (*StreamEvent, error) {
+	if s.closed {
+		return nil, fmt.Errorf("stream is closed")
+	}
+
+	var currentEvent string
+	var currentData strings.Builder
+
+	for s.scanner.Scan() {
+		line := s.scanner.Text()
+
+		// Empty line indicates end of event
+		if line == "" {
+			if currentEvent != "" && currentData.Len() > 0 {
+				// Parse the event data
+				var event StreamEvent
+				if err := json.Unmarshal([]byte(currentData.String()), &event); err != nil {
+					// Reset for next event
+					currentEvent = ""
+					currentData.Reset()
+					continue
+				}
+
+				// Only return events we care about
+				if event.Type == "content_block_delta" || event.Type == "message_start" ||
+					event.Type == "message_delta" || event.Type == "message_stop" {
+					// Reset for next event
+					currentEvent = ""
+					currentData.Reset()
+					return &event, nil
+				}
+
+				// Reset for next event
+				currentEvent = ""
+				currentData.Reset()
+			}
+			continue
+		}
+
+		// Parse event type
+		if strings.HasPrefix(line, "event: ") {
+			currentEvent = strings.TrimPrefix(line, "event: ")
+			continue
+		}
+
+		// Parse data
+		if strings.HasPrefix(line, "data: ") {
+			data := strings.TrimPrefix(line, "data: ")
+			currentData.WriteString(data)
+			continue
+		}
+	}
+
+	if err := s.scanner.Err(); err != nil {
+		return nil, fmt.Errorf("stream error: %w", err)
+	}
+
+	return nil, io.EOF
+}
+
+// Close closes the stream
+func (s *Stream) Close() error {
+	if !s.closed {
+		s.closed = true
+		return s.response.Body.Close()
+	}
+	return nil
+}
+
+// boolPtr creates a pointer to a bool value
+func boolPtr(b bool) *bool {
+	return &b
 }

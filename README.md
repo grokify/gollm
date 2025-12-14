@@ -138,7 +138,7 @@ client, err := gollm.NewClient(gollm.ClientConfig{
 ### Anthropic (Claude)
 
 - **Models**: Claude-3-Opus, Claude-3-Sonnet, Claude-3-Haiku, Claude-Sonnet-4
-- **Features**: Chat completions with system message support
+- **Features**: Chat completions, streaming, system message support
 
 ```go
 client, err := gollm.NewClient(gollm.ClientConfig{
@@ -381,6 +381,7 @@ Run examples:
 ```bash
 go run examples/basic/main.go
 go run examples/streaming/main.go
+go run examples/anthropic_streaming/main.go
 go run examples/conversation/main.go
 go run examples/memory_demo/main.go
 go run examples/providers_demo/main.go
@@ -515,7 +516,7 @@ To add a built-in provider to the core library, follow the same structure as exi
 | Provider | Models | Features |
 |----------|--------|----------|
 | OpenAI | GPT-5, GPT-5-mini, GPT-5-nano, GPT-4.1, GPT-4.1-mini, GPT-4.1-nano | Chat, Streaming, Functions |
-| Anthropic | Claude-3-Opus, Claude-3-Sonnet, Claude-3-Haiku | Chat, Streaming, System messages |
+| Anthropic | Claude-Opus-4, Claude-Sonnet-4, Claude-3-Opus, Claude-3-Sonnet, Claude-3-Haiku | Chat, Streaming, System messages |
 | Gemini | Gemini-2.5-Pro, Gemini-2.5-Flash, Gemini-Pro | Chat, Streaming |
 | Bedrock | Claude models, Titan models | Chat, Multiple model families |
 | Ollama | Llama 3, Mistral, CodeLlama, Gemma, Qwen2.5 | Chat, Streaming, Local inference |
