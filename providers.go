@@ -7,6 +7,7 @@ import (
 	"github.com/grokify/gollm/providers/gemini"
 	"github.com/grokify/gollm/providers/ollama"
 	"github.com/grokify/gollm/providers/openai"
+	"github.com/grokify/gollm/providers/xai"
 )
 
 // newOpenAIProvider creates a new OpenAI provider adapter
@@ -41,4 +42,12 @@ func newGeminiProvider(config ClientConfig) (provider.Provider, error) {
 		return nil, ErrEmptyAPIKey
 	}
 	return gemini.NewProvider(config.APIKey), nil
+}
+
+// newXAIProvider creates a new X.AI provider adapter
+func newXAIProvider(config ClientConfig) (provider.Provider, error) {
+	if config.APIKey == "" {
+		return nil, ErrEmptyAPIKey
+	}
+	return xai.NewProvider(config.APIKey, config.BaseURL), nil
 }

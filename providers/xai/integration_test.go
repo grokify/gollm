@@ -1,0 +1,181 @@
+package xai
+
+import (
+	"context"
+	"io"
+	"os"
+	"testing"
+	"time"
+
+	"github.com/grokify/gollm/provider"
+)
+
+// TestXAIIntegration_ChatCompletion tests actual API calls
+func TestXAIIntegration_ChatCompletion(t *testing.T) {
+	apiKey := os.Getenv("XAI_API_KEY")
+	if apiKey == "" {
+		t.Skip("Skipping integration test: XAI_API_KEY not set")
+	}
+
+	p := NewProvider(apiKey, "")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	req := &provider.ChatCompletionRequest{
+		Model: "grok-3",
+		Messages: []provider.Message{
+			{
+				Role:    provider.RoleUser,
+				Content: "Say 'test successful' if you can read this.",
+			},
+		},
+		MaxTokens:   intPtr(50),
+		Temperature: float64Ptr(0.5),
+	}
+
+	resp, err := p.CreateChatCompletion(ctx, req)
+	if err != nil {
+		t.Fatalf("CreateChatCompletion failed: %v", err)
+	}
+
+	// Verify response structure
+	if resp.ID == "" {
+		t.Error("Response ID is empty")
+	}
+	if resp.Model == "" {
+		t.Error("Response model is empty")
+	}
+	if len(resp.Choices) == 0 {
+		t.Fatal("No choices in response")
+	}
+	if resp.Choices[0].Message.Content == "" {
+		t.Error("Response content is empty")
+	}
+	if resp.Usage.TotalTokens == 0 {
+		t.Error("Usage tokens is zero")
+	}
+
+	t.Logf("Response: %s", resp.Choices[0].Message.Content)
+	t.Logf("Tokens used: %d", resp.Usage.TotalTokens)
+}
+
+// TestXAIIntegration_Streaming tests actual streaming API calls
+func TestXAIIntegration_Streaming(t *testing.T) {
+	apiKey := os.Getenv("XAI_API_KEY")
+	if apiKey == "" {
+		t.Skip("Skipping integration test: XAI_API_KEY not set")
+	}
+
+	p := NewProvider(apiKey, "")
+
+	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
+	defer cancel()
+
+	req := &provider.ChatCompletionRequest{
+		Model: "grok-3",
+		Messages: []provider.Message{
+			{
+				Role:    provider.RoleUser,
+				Content: "Count from 1 to 5, one number per line.",
+			},
+		},
+		MaxTokens:   intPtr(50),
+		Temperature: float64Ptr(0.5),
+	}
+
+	stream, err := p.CreateChatCompletionStream(ctx, req)
+	if err != nil {
+		t.Fatalf("CreateChatCompletionStream failed: %v", err)
+	}
+	defer stream.Close()
+
+	var totalContent string
+	chunkCount := 0
+
+	for {
+		chunk, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			t.Fatalf("Stream recv error: %v", err)
+		}
+
+		chunkCount++
+
+		if len(chunk.Choices) > 0 && chunk.Choices[0].Delta != nil {
+			content := chunk.Choices[0].Delta.Content
+			totalContent += content
+		}
+	}
+
+	if chunkCount == 0 {
+		t.Fatal("No chunks received from stream")
+	}
+
+	t.Logf("Received %d chunks", chunkCount)
+	t.Logf("Complete response: %s", totalContent)
+}
+
+// TestXAIIntegration_ErrorHandling tests API error responses
+func TestXAIIntegration_ErrorHandling(t *testing.T) {
+	apiKey := os.Getenv("XAI_API_KEY")
+	if apiKey == "" {
+		t.Skip("Skipping integration test: XAI_API_KEY not set")
+	}
+
+	tests := []struct {
+		name      string
+		request   *provider.ChatCompletionRequest
+		wantError bool
+	}{
+		{
+			name: "empty model",
+			request: &provider.ChatCompletionRequest{
+				Model: "",
+				Messages: []provider.Message{
+					{Role: provider.RoleUser, Content: "Hello"},
+				},
+			},
+			wantError: true,
+		},
+		{
+			name: "empty messages",
+			request: &provider.ChatCompletionRequest{
+				Model:    "grok-3",
+				Messages: []provider.Message{},
+			},
+			wantError: true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p := NewProvider(apiKey, "")
+			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+			defer cancel()
+
+			_, err := p.CreateChatCompletion(ctx, tt.request)
+
+			if tt.wantError && err == nil {
+				t.Error("Expected error but got none")
+			}
+			if !tt.wantError && err != nil {
+				t.Errorf("Unexpected error: %v", err)
+			}
+			if err != nil {
+				t.Logf("Expected error received: %v", err)
+			}
+		})
+	}
+}
+
+// Helper functions
+func intPtr(i int) *int {
+	return &i
+}
+
+func float64Ptr(f float64) *float64 {
+	return &f
+}

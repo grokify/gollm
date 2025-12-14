@@ -6,11 +6,11 @@
 [![Docs][docs-godoc-svg]][docs-godoc-url]
 [![License][license-svg]][license-url]
 
-GoLLM is a unified Go SDK that provides a consistent interface for interacting with multiple Large Language Model (LLM) providers including OpenAI, Anthropic (Claude), Google Gemini, AWS Bedrock, and Ollama. It implements the Chat Completions API pattern and offers both synchronous and streaming capabilities.
+GoLLM is a unified Go SDK that provides a consistent interface for interacting with multiple Large Language Model (LLM) providers including OpenAI, Anthropic (Claude), Google Gemini, AWS Bedrock, X.AI (Grok), and Ollama. It implements the Chat Completions API pattern and offers both synchronous and streaming capabilities.
 
 ## ✨ Features
 
-- **🔌 Multi-Provider Support**: OpenAI, Anthropic (Claude), Google Gemini, AWS Bedrock, and Ollama
+- **🔌 Multi-Provider Support**: OpenAI, Anthropic (Claude), Google Gemini, AWS Bedrock, X.AI (Grok), and Ollama
 - **🎯 Unified API**: Same interface across all providers
 - **📡 Streaming Support**: Real-time response streaming for all providers
 - **🧠 Conversation Memory**: Persistent conversation history using Key-Value Stores
@@ -166,6 +166,19 @@ client, err := gollm.NewClient(gollm.ClientConfig{
 client, err := gollm.NewClient(gollm.ClientConfig{
     Provider: gollm.ProviderNameBedrock,
     Region:   "us-east-1", // AWS region
+})
+```
+
+### X.AI (Grok)
+
+- **Models**: Grok-3, Grok-3-Mini, Grok-2, Grok-2-Vision
+- **Features**: Chat completions, streaming, OpenAI-compatible API
+
+```go
+client, err := gollm.NewClient(gollm.ClientConfig{
+    Provider: gollm.ProviderNameXAI,
+    APIKey:   "your-xai-api-key",
+    BaseURL:  "https://api.x.ai/v1", // optional
 })
 ```
 
@@ -441,6 +454,7 @@ go run examples/anthropic_streaming/main.go
 go run examples/conversation/main.go
 go run examples/memory_demo/main.go
 go run examples/providers_demo/main.go
+go run examples/xai/main.go
 go run examples/ollama/main.go
 go run examples/ollama_streaming/main.go
 go run examples/gemini/main.go
@@ -453,6 +467,7 @@ go run examples/custom_provider/main.go
 - `OPENAI_API_KEY`: Your OpenAI API key
 - `ANTHROPIC_API_KEY`: Your Anthropic API key
 - `GEMINI_API_KEY`: Your Google Gemini API key
+- `XAI_API_KEY`: Your X.AI API key
 - AWS credentials for Bedrock (via AWS CLI/SDK configuration)
 
 ### Advanced Configuration
@@ -575,6 +590,7 @@ To add a built-in provider to the core library, follow the same structure as exi
 | Anthropic | Claude-Opus-4, Claude-Sonnet-4, Claude-3-Opus, Claude-3-Sonnet, Claude-3-Haiku | Chat, Streaming, System messages |
 | Gemini | Gemini-2.5-Pro, Gemini-2.5-Flash, Gemini-Pro | Chat, Streaming |
 | Bedrock | Claude models, Titan models | Chat, Multiple model families |
+| X.AI | Grok-3, Grok-3-Mini, Grok-2, Grok-2-Vision | Chat, Streaming, OpenAI-compatible |
 | Ollama | Llama 3, Mistral, CodeLlama, Gemma, Qwen2.5 | Chat, Streaming, Local inference |
 
 ## 🚨 Error Handling

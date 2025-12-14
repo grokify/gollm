@@ -54,6 +54,8 @@ func NewClient(config ClientConfig) (*ChatClient, error) {
 			prov, err = newOllamaProvider(config)
 		case ProviderNameGemini:
 			prov, err = newGeminiProvider(config)
+		case ProviderNameXAI:
+			prov, err = newXAIProvider(config)
 		default:
 			return nil, ErrUnsupportedProvider
 		}
