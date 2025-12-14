@@ -29,11 +29,11 @@ func DefaultMemoryConfig() MemoryConfig {
 
 // ConversationMemory represents stored conversation data
 type ConversationMemory struct {
-	SessionID string                 `json:"session_id"`
-	Messages  []Message              `json:"messages"`
-	CreatedAt time.Time              `json:"created_at"`
-	UpdatedAt time.Time              `json:"updated_at"`
-	Metadata  map[string]interface{} `json:"metadata,omitempty"`
+	SessionID string         `json:"session_id"`
+	Messages  []Message      `json:"messages"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
+	Metadata  map[string]any `json:"metadata,omitempty"`
 }
 
 // MemoryManager handles conversation persistence using KVS
@@ -67,7 +67,7 @@ func (m *MemoryManager) LoadConversation(ctx context.Context, sessionID string) 
 			Messages:  []Message{},
 			CreatedAt: time.Now(),
 			UpdatedAt: time.Now(),
-			Metadata:  make(map[string]interface{}),
+			Metadata:  make(map[string]any),
 		}, nil
 	}
 
@@ -157,14 +157,14 @@ func (m *MemoryManager) GetMessages(ctx context.Context, sessionID string) ([]Me
 }
 
 // SetMetadata sets metadata for a conversation
-func (m *MemoryManager) SetMetadata(ctx context.Context, sessionID string, metadata map[string]interface{}) error {
+func (m *MemoryManager) SetMetadata(ctx context.Context, sessionID string, metadata map[string]any) error {
 	conversation, err := m.LoadConversation(ctx, sessionID)
 	if err != nil {
 		return fmt.Errorf("failed to load conversation: %w", err)
 	}
 
 	if conversation.Metadata == nil {
-		conversation.Metadata = make(map[string]interface{})
+		conversation.Metadata = make(map[string]any)
 	}
 
 	for k, v := range metadata {
@@ -191,7 +191,7 @@ func (m *MemoryManager) CreateConversationWithSystemMessage(ctx context.Context,
 		},
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
-		Metadata:  make(map[string]interface{}),
+		Metadata:  make(map[string]any),
 	}
 
 	return m.SaveConversation(ctx, conversation)

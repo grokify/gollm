@@ -48,7 +48,7 @@ func TestMemoryManager_SaveAndLoadConversation(t *testing.T) {
 		},
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
-		Metadata:  make(map[string]interface{}),
+		Metadata:  make(map[string]any),
 	}
 
 	err := mm.SaveConversation(ctx, conv)
@@ -266,7 +266,7 @@ func TestMemoryManager_SetMetadata(t *testing.T) {
 	sessionID := "session1"
 
 	// Set metadata
-	metadata := map[string]interface{}{
+	metadata := map[string]any{
 		"user_id": "user123",
 		"tags":    []string{"test", "demo"},
 	}

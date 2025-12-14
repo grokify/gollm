@@ -268,7 +268,7 @@ func currentTimestamp() int64 {
 	return time.Now().Unix()
 }
 
-func estimateTokens(data interface{}) int {
+func estimateTokens(data any) int {
 	// Simple token estimation - in a real implementation you might use
 	// a more sophisticated method or actual token counting
 	switch v := data.(type) {

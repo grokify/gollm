@@ -30,7 +30,7 @@ type ClientConfig struct {
 	CustomProvider provider.Provider
 
 	// Provider-specific configurations can be added here
-	Extra map[string]interface{}
+	Extra map[string]any
 }
 
 // NewClient creates a new ChatClient based on the provider

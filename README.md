@@ -479,7 +479,7 @@ config := gollm.ClientConfig{
     Provider: gollm.ProviderNameOpenAI,
     APIKey:   "your-api-key",
     BaseURL:  "https://custom-endpoint.com/v1",
-    Extra: map[string]interface{}{
+    Extra: map[string]any{
         "timeout": 60, // Custom provider-specific settings
     },
 }
