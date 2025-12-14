@@ -16,10 +16,10 @@ func TestProvider_Name(t *testing.T) {
 
 func TestProvider_CreateChatCompletion_MessageConversion(t *testing.T) {
 	tests := []struct {
-		name           string
-		messages       []provider.Message
-		wantSystem     string
-		wantMsgCount   int
+		name         string
+		messages     []provider.Message
+		wantSystem   string
+		wantMsgCount int
 	}{
 		{
 			name: "system message separated",
@@ -87,11 +87,11 @@ func TestProvider_CreateChatCompletion_MessageConversion(t *testing.T) {
 
 func TestStreamAdapter_EventHandling(t *testing.T) {
 	tests := []struct {
-		name       string
-		event      StreamEvent
-		wantError  bool
-		wantEmpty  bool
-		wantText   string
+		name      string
+		event     StreamEvent
+		wantError bool
+		wantEmpty bool
+		wantText  string
 	}{
 		{
 			name: "message_start event",
