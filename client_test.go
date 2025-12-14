@@ -12,12 +12,12 @@ import (
 
 // MockProvider implements provider.Provider for testing
 type MockProvider struct {
-	name              string
-	completionError   error
-	streamError       error
-	completionResp    *provider.ChatCompletionResponse
-	streamChunks      []*provider.ChatCompletionChunk
-	streamChunkIndex  int
+	name                   string
+	completionError        error
+	streamError            error
+	completionResp         *provider.ChatCompletionResponse
+	streamChunks           []*provider.ChatCompletionChunk
+	streamChunkIndex       int
 	createCompletionCalled bool
 	createStreamCalled     bool
 }
