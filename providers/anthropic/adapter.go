@@ -67,6 +67,14 @@ func (p *Provider) CreateChatCompletion(ctx context.Context, req *provider.ChatC
 		content = resp.Content[0].Text
 	}
 
+	// Preserve Anthropic-specific metadata
+	metadata := map[string]any{
+		"anthropic_type":        resp.Type,
+		"anthropic_role":        resp.Role,
+		"anthropic_content":     resp.Content, // Full content array
+		"anthropic_stop_reason": resp.StopReason,
+	}
+
 	return &provider.ChatCompletionResponse{
 		ID:      resp.ID,
 		Object:  "chat.completion",
@@ -87,6 +95,7 @@ func (p *Provider) CreateChatCompletion(ctx context.Context, req *provider.ChatC
 			CompletionTokens: resp.Usage.OutputTokens,
 			TotalTokens:      resp.Usage.InputTokens + resp.Usage.OutputTokens,
 		},
+		ProviderMetadata: metadata,
 	}, nil
 }
 
@@ -158,12 +167,17 @@ func (s *StreamAdapter) Recv() (*provider.ChatCompletionChunk, error) {
 			s.model = event.Message.Model
 		}
 		// Return empty chunk for message_start
+		metadata := map[string]any{
+			"anthropic_event_type": event.Type,
+			"anthropic_message":    event.Message,
+		}
 		return &provider.ChatCompletionChunk{
-			ID:      s.messageID,
-			Object:  "chat.completion.chunk",
-			Created: time.Now().Unix(),
-			Model:   s.model,
-			Choices: []provider.ChatCompletionChoice{},
+			ID:               s.messageID,
+			Object:           "chat.completion.chunk",
+			Created:          time.Now().Unix(),
+			Model:            s.model,
+			Choices:          []provider.ChatCompletionChoice{},
+			ProviderMetadata: metadata,
 		}, nil
 
 	case "content_block_delta":
@@ -171,6 +185,12 @@ func (s *StreamAdapter) Recv() (*provider.ChatCompletionChunk, error) {
 		var content string
 		if event.Delta != nil && event.Delta.Type == "text_delta" {
 			content = event.Delta.Text
+		}
+
+		metadata := map[string]any{
+			"anthropic_event_type": event.Type,
+			"anthropic_delta":      event.Delta,
+			"anthropic_index":      event.Index,
 		}
 
 		return &provider.ChatCompletionChunk{
@@ -187,6 +207,7 @@ func (s *StreamAdapter) Recv() (*provider.ChatCompletionChunk, error) {
 					},
 				},
 			},
+			ProviderMetadata: metadata,
 		}, nil
 
 	case "message_delta":
@@ -194,6 +215,12 @@ func (s *StreamAdapter) Recv() (*provider.ChatCompletionChunk, error) {
 		var finishReason *string
 		if event.Delta != nil && event.Delta.StopReason != "" {
 			finishReason = &event.Delta.StopReason
+		}
+
+		metadata := map[string]any{
+			"anthropic_event_type": event.Type,
+			"anthropic_delta":      event.Delta,
+			"anthropic_usage":      event.Usage,
 		}
 
 		chunk := &provider.ChatCompletionChunk{
@@ -207,6 +234,7 @@ func (s *StreamAdapter) Recv() (*provider.ChatCompletionChunk, error) {
 					FinishReason: finishReason,
 				},
 			},
+			ProviderMetadata: metadata,
 		}
 
 		// Add usage if available
@@ -220,12 +248,16 @@ func (s *StreamAdapter) Recv() (*provider.ChatCompletionChunk, error) {
 
 	case "message_stop":
 		// End of stream - return empty chunk
+		metadata := map[string]any{
+			"anthropic_event_type": event.Type,
+		}
 		return &provider.ChatCompletionChunk{
-			ID:      s.messageID,
-			Object:  "chat.completion.chunk",
-			Created: time.Now().Unix(),
-			Model:   s.model,
-			Choices: []provider.ChatCompletionChoice{},
+			ID:               s.messageID,
+			Object:           "chat.completion.chunk",
+			Created:          time.Now().Unix(),
+			Model:            s.model,
+			Choices:          []provider.ChatCompletionChoice{},
+			ProviderMetadata: metadata,
 		}, nil
 
 	default:

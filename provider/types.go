@@ -46,7 +46,7 @@ type ChatCompletionRequest struct {
 	LogitBias        map[string]int `json:"logit_bias,omitempty"`
 	User             *string        `json:"user,omitempty"`
 	Tools            []Tool         `json:"tools,omitempty"`
-	ToolChoice       interface{}    `json:"tool_choice,omitempty"`
+	ToolChoice       any            `json:"tool_choice,omitempty"`
 }
 
 // Tool represents a tool that can be called
@@ -57,9 +57,9 @@ type Tool struct {
 
 // ToolSpec defines a tool specification
 type ToolSpec struct {
-	Name        string      `json:"name"`
-	Description string      `json:"description"`
-	Parameters  interface{} `json:"parameters"`
+	Name        string `json:"name"`
+	Description string `json:"description"`
+	Parameters  any    `json:"parameters"`
 }
 
 // ChatCompletionResponse represents a response from chat completion
@@ -71,15 +71,16 @@ type ChatCompletionResponse struct {
 	SystemFingerprint *string                `json:"system_fingerprint,omitempty"`
 	Choices           []ChatCompletionChoice `json:"choices"`
 	Usage             Usage                  `json:"usage"`
+	ProviderMetadata  map[string]any         `json:"provider_metadata,omitempty"` // Provider-specific metadata
 }
 
 // ChatCompletionChoice represents a single choice in the response
 type ChatCompletionChoice struct {
-	Index        int         `json:"index"`
-	Message      Message     `json:"message"`
-	Delta        *Message    `json:"delta,omitempty"`
-	FinishReason *string     `json:"finish_reason"`
-	Logprobs     interface{} `json:"logprobs,omitempty"`
+	Index        int      `json:"index"`
+	Message      Message  `json:"message"`
+	Delta        *Message `json:"delta,omitempty"`
+	FinishReason *string  `json:"finish_reason"`
+	Logprobs     any      `json:"logprobs,omitempty"`
 }
 
 // Usage represents token usage information
@@ -98,4 +99,5 @@ type ChatCompletionChunk struct {
 	SystemFingerprint *string                `json:"system_fingerprint,omitempty"`
 	Choices           []ChatCompletionChoice `json:"choices"`
 	Usage             *Usage                 `json:"usage,omitempty"`
+	ProviderMetadata  map[string]any         `json:"provider_metadata,omitempty"` // Provider-specific metadata
 }
