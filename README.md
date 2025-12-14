@@ -12,9 +12,9 @@ GoLLM is a unified Go SDK that provides a consistent interface for interacting w
 
 - **🔌 Multi-Provider Support**: OpenAI, Anthropic (Claude), Google Gemini, AWS Bedrock, and Ollama
 - **🎯 Unified API**: Same interface across all providers
-- **📡 Streaming Support**: Real-time response streaming
+- **📡 Streaming Support**: Real-time response streaming for all providers
 - **🧠 Conversation Memory**: Persistent conversation history using Key-Value Stores
-- **🧪 Testable**: Clean interfaces that can be easily mocked
+- **🧪 Comprehensive Testing**: Unit tests, integration tests, and mock implementations included
 - **🔧 Extensible**: Easy to add new LLM providers
 - **📦 Modular**: Provider-specific implementations in separate packages
 - **🏗️ Reference Architecture**: Internal providers serve as reference implementations for external providers
@@ -32,30 +32,26 @@ gollm/
 ├── types.go             # Type aliases for backward compatibility
 ├── memory.go            # Conversation memory management
 ├── errors.go            # Unified error handling
+├── *_test.go            # Comprehensive unit tests
 ├── provider/            # 🎯 Public interface package for external providers
 │   ├── interface.go     # Provider interface that all providers must implement
 │   └── types.go         # Unified request/response types
-└── providers/           # 📦 Individual provider packages (reference implementations)
-    ├── openai/          # OpenAI implementation
-    │   ├── openai.go    # HTTP client
-    │   ├── types.go     # OpenAI-specific types
-    │   └── adapter.go   # provider.Provider implementation
-    ├── anthropic/       # Anthropic implementation
-    │   ├── anthropic.go # HTTP client
-    │   ├── types.go     # Anthropic-specific types
-    │   └── adapter.go   # provider.Provider implementation
-    ├── gemini/          # Google Gemini implementation
-    │   ├── gemini.go    # HTTP client
-    │   ├── types.go     # Gemini-specific types
-    │   └── adapter.go   # provider.Provider implementation
-    ├── bedrock/         # AWS Bedrock implementation
-    │   ├── bedrock.go   # AWS client
-    │   ├── types.go     # Bedrock-specific types
-    │   └── adapter.go   # provider.Provider implementation
-    └── ollama/          # Ollama implementation
-        ├── ollama.go    # HTTP client
-        ├── types.go     # Ollama-specific types
-        └── adapter.go   # provider.Provider implementation
+├── providers/           # 📦 Individual provider packages (reference implementations)
+│   ├── openai/          # OpenAI implementation
+│   │   ├── openai.go    # HTTP client
+│   │   ├── types.go     # OpenAI-specific types
+│   │   ├── adapter.go   # provider.Provider implementation
+│   │   └── *_test.go    # Provider tests
+│   ├── anthropic/       # Anthropic implementation
+│   │   ├── anthropic.go # HTTP client (SSE streaming)
+│   │   ├── types.go     # Anthropic-specific types
+│   │   ├── adapter.go   # provider.Provider implementation
+│   │   └── *_test.go    # Provider and integration tests
+│   ├── gemini/          # Google Gemini implementation
+│   ├── bedrock/         # AWS Bedrock implementation
+│   └── ollama/          # Ollama implementation
+└── testing/             # 🧪 Test utilities
+    └── mock_kvs.go      # Mock KVS for memory testing
 ```
 
 ### Key Architecture Benefits
@@ -66,6 +62,7 @@ gollm/
 - **📦 Modular Design**: Each provider is self-contained with its own HTTP client, types, and adapter
 - **🧪 Testable**: Clean interfaces that can be easily mocked and tested
 - **🔧 Extensible**: New providers can be added without touching existing code
+- **⚡ Native Implementation**: Uses standard `net/http` for direct API communication (no official SDK dependencies)
 
 ## 🚀 Quick Start
 
@@ -339,6 +336,34 @@ response3, _ := geminiClient.CreateChatCompletion(ctx, request)
 
 ## 🧪 Testing
 
+GoLLM includes a comprehensive test suite with both unit tests and integration tests.
+
+### Running Tests
+
+```bash
+# Run all unit tests (no API keys required)
+go test ./... -short
+
+# Run with coverage
+go test ./... -short -cover
+
+# Run integration tests (requires API keys)
+ANTHROPIC_API_KEY=your-key go test ./providers/anthropic -v
+OPENAI_API_KEY=your-key go test ./providers/openai -v
+
+# Run all tests including integration
+ANTHROPIC_API_KEY=your-key OPENAI_API_KEY=your-key go test ./... -v
+```
+
+### Test Coverage
+
+- **Unit Tests**: Mock-based tests that run without external dependencies
+- **Integration Tests**: Real API tests that skip gracefully when API keys are not set
+- **Memory Tests**: Comprehensive conversation memory management tests
+- **Provider Tests**: Adapter logic, message conversion, and streaming tests
+
+### Writing Tests
+
 The clean interface design makes testing straightforward:
 
 ```go
@@ -364,6 +389,37 @@ func (m *mockProvider) CreateChatCompletionStream(ctx context.Context, req *goll
 
 func (m *mockProvider) Close() error { return nil }
 func (m *mockProvider) Name() string { return "mock" }
+```
+
+### Conditional Integration Tests
+
+Integration tests automatically skip when API keys are not available:
+
+```go
+func TestAnthropicIntegration_Streaming(t *testing.T) {
+    apiKey := os.Getenv("ANTHROPIC_API_KEY")
+    if apiKey == "" {
+        t.Skip("Skipping integration test: ANTHROPIC_API_KEY not set")
+    }
+    // Test code here...
+}
+```
+
+### Mock KVS for Memory Testing
+
+GoLLM provides a mock KVS implementation for testing memory functionality:
+
+```go
+import mocktest "github.com/grokify/gollm/testing"
+
+// Create mock KVS for testing
+mockKVS := mocktest.NewMockKVS()
+
+client, err := gollm.NewClient(gollm.ClientConfig{
+    Provider: gollm.ProviderNameOpenAI,
+    APIKey:   "test-key",
+    Memory:   mockKVS,
+})
 ```
 
 ## 📚 Examples
@@ -537,11 +593,28 @@ if err != nil {
 
 ## 🤝 Contributing
 
+Contributions are welcome! Please follow these steps:
+
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+3. Make your changes
+4. Run tests to ensure everything works:
+   ```bash
+   go test ./... -short        # Run unit tests
+   go build ./...              # Verify build
+   go vet ./...                # Run static analysis
+   ```
+5. Commit your changes (`git commit -m 'Add some amazing feature'`)
+6. Push to the branch (`git push origin feature/amazing-feature`)
+7. Open a Pull Request
+
+### Adding Tests
+
+When contributing new features:
+- Add unit tests for core logic
+- Add integration tests for provider implementations (with API key checks)
+- Ensure tests pass without API keys using `-short` flag
+- Mock external dependencies when possible
 
 ## 📄 License
 
