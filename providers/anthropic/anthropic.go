@@ -145,10 +145,10 @@ func (c *Client) handleErrorResponse(resp *http.Response) error {
 	}
 
 	if err := json.Unmarshal(body, &errorResp); err != nil {
-		return fmt.Errorf("API error: %s", string(body))
+		return fmt.Errorf("api error: %s", string(body))
 	}
 
-	return fmt.Errorf("Anthropic API error: %s", errorResp.Error.Message)
+	return fmt.Errorf("anthropic api error: %s", errorResp.Error.Message)
 }
 
 // Stream implements streaming for Anthropic
@@ -185,9 +185,6 @@ func (s *Stream) Recv() (*StreamEvent, error) {
 				// Only return events we care about
 				if event.Type == "content_block_delta" || event.Type == "message_start" ||
 					event.Type == "message_delta" || event.Type == "message_stop" {
-					// Reset for next event
-					currentEvent = ""
-					currentData.Reset()
 					return &event, nil
 				}
 

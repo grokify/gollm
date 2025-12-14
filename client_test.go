@@ -17,7 +17,6 @@ type MockProvider struct {
 	streamError            error
 	completionResp         *provider.ChatCompletionResponse
 	streamChunks           []*provider.ChatCompletionChunk
-	streamChunkIndex       int
 	createCompletionCalled bool
 	createStreamCalled     bool
 }

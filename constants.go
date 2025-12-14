@@ -73,10 +73,10 @@ const (
 	ModelVertexClaudeOpus4 = "claude-opus-4@20250514"
 
 	// X.AI Grok Models
-	ModelGrok3          = "grok-3"              // Latest Grok model
-	ModelGrok3Mini      = "grok-3-mini"         // Smaller, faster Grok model
-	ModelGrok2_1212     = "grok-2-1212"         // Grok 2 (December 2024)
-	ModelGrok2_Vision   = "grok-2-vision-1212"  // Grok 2 with vision
-	ModelGrokBeta       = "grok-beta"           // Deprecated: use grok-3
-	ModelGrokVision     = "grok-vision-beta"    // Deprecated
+	ModelGrok3        = "grok-3"             // Latest Grok model
+	ModelGrok3Mini    = "grok-3-mini"        // Smaller, faster Grok model
+	ModelGrok2_1212   = "grok-2-1212"        // Grok 2 (December 2024)
+	ModelGrok2_Vision = "grok-2-vision-1212" // Grok 2 with vision
+	ModelGrokBeta     = "grok-beta"          // Deprecated: use grok-3
+	ModelGrokVision   = "grok-vision-beta"   // Deprecated
 )
