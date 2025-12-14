@@ -49,6 +49,7 @@ gollm/
 │   │   └── *_test.go    # Provider and integration tests
 │   ├── gemini/          # Google Gemini implementation
 │   ├── bedrock/         # AWS Bedrock implementation
+│   ├── xai/             # X.AI Grok implementation
 │   └── ollama/          # Ollama implementation
 └── testing/             # 🧪 Test utilities
     └── mock_kvs.go      # Mock KVS for memory testing
@@ -121,7 +122,7 @@ func main() {
 
 ### OpenAI
 
-- **Models**: GPT-4o, GPT-4o-mini, GPT-4-turbo, GPT-3.5-turbo
+- **Models**: GPT-5, GPT-4.1, GPT-4o, GPT-4o-mini, GPT-4-turbo, GPT-3.5-turbo
 - **Features**: Chat completions, streaming, function calling
 
 ```go
@@ -134,7 +135,7 @@ client, err := gollm.NewClient(gollm.ClientConfig{
 
 ### Anthropic (Claude)
 
-- **Models**: Claude-3-Opus, Claude-3-Sonnet, Claude-3-Haiku, Claude-Sonnet-4
+- **Models**: Claude-Opus-4.1, Claude-Opus-4, Claude-Sonnet-4, Claude-3.7-Sonnet, Claude-3.5-Haiku, Claude-3-Opus, Claude-3-Sonnet, Claude-3-Haiku
 - **Features**: Chat completions, streaming, system message support
 
 ```go
@@ -147,7 +148,7 @@ client, err := gollm.NewClient(gollm.ClientConfig{
 
 ### Google Gemini
 
-- **Models**: Gemini-2.5-Pro, Gemini-2.5-Flash, Gemini-1.5-Pro, Gemini-1.5-Flash, Gemini-Pro
+- **Models**: Gemini-2.5-Pro, Gemini-2.5-Flash, Gemini-1.5-Pro, Gemini-1.5-Flash
 - **Features**: Chat completions, streaming
 
 ```go
@@ -363,9 +364,10 @@ go test ./... -short -cover
 # Run integration tests (requires API keys)
 ANTHROPIC_API_KEY=your-key go test ./providers/anthropic -v
 OPENAI_API_KEY=your-key go test ./providers/openai -v
+XAI_API_KEY=your-key go test ./providers/xai -v
 
 # Run all tests including integration
-ANTHROPIC_API_KEY=your-key OPENAI_API_KEY=your-key go test ./... -v
+ANTHROPIC_API_KEY=your-key OPENAI_API_KEY=your-key XAI_API_KEY=your-key go test ./... -v
 ```
 
 ### Test Coverage
@@ -586,12 +588,12 @@ To add a built-in provider to the core library, follow the same structure as exi
 
 | Provider | Models | Features |
 |----------|--------|----------|
-| OpenAI | GPT-5, GPT-5-mini, GPT-5-nano, GPT-4.1, GPT-4.1-mini, GPT-4.1-nano | Chat, Streaming, Functions |
-| Anthropic | Claude-Opus-4, Claude-Sonnet-4, Claude-3-Opus, Claude-3-Sonnet, Claude-3-Haiku | Chat, Streaming, System messages |
-| Gemini | Gemini-2.5-Pro, Gemini-2.5-Flash, Gemini-Pro | Chat, Streaming |
+| OpenAI | GPT-5, GPT-4.1, GPT-4o, GPT-4o-mini, GPT-4-turbo, GPT-3.5-turbo | Chat, Streaming, Functions |
+| Anthropic | Claude-Opus-4.1, Claude-Opus-4, Claude-Sonnet-4, Claude-3.7-Sonnet, Claude-3.5-Haiku | Chat, Streaming, System messages |
+| Gemini | Gemini-2.5-Pro, Gemini-2.5-Flash, Gemini-1.5-Pro, Gemini-1.5-Flash | Chat, Streaming |
 | Bedrock | Claude models, Titan models | Chat, Multiple model families |
 | X.AI | Grok-3, Grok-3-Mini, Grok-2, Grok-2-Vision | Chat, Streaming, OpenAI-compatible |
-| Ollama | Llama 3, Mistral, CodeLlama, Gemma, Qwen2.5 | Chat, Streaming, Local inference |
+| Ollama | Llama 3, Mistral, CodeLlama, Gemma, Qwen2.5, DeepSeek-Coder | Chat, Streaming, Local inference |
 
 ## 🚨 Error Handling
 
