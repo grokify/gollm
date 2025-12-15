@@ -23,7 +23,7 @@ func TestXAIIntegration_ChatCompletion(t *testing.T) {
 	defer cancel()
 
 	req := &provider.ChatCompletionRequest{
-		Model: "grok-3",
+		Model: "grok-4-1-fast-reasoning",
 		Messages: []provider.Message{
 			{
 				Role:    provider.RoleUser,
@@ -73,7 +73,7 @@ func TestXAIIntegration_Streaming(t *testing.T) {
 	defer cancel()
 
 	req := &provider.ChatCompletionRequest{
-		Model: "grok-3",
+		Model: "grok-4-1-fast-reasoning",
 		Messages: []provider.Message{
 			{
 				Role:    provider.RoleUser,

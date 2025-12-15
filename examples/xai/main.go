@@ -51,7 +51,7 @@ func demonstrateBasicCompletion(apiKey string) error {
 	defer client.Close()
 
 	response, err := client.CreateChatCompletion(context.Background(), &gollm.ChatCompletionRequest{
-		Model: gollm.ModelGrok3,
+		Model: gollm.ModelGrok4_1FastReasoning,
 		Messages: []gollm.Message{
 			{
 				Role:    gollm.RoleUser,
@@ -84,7 +84,7 @@ func demonstrateStreaming(apiKey string) error {
 	fmt.Print("Grok: ")
 
 	stream, err := client.CreateChatCompletionStream(context.Background(), &gollm.ChatCompletionRequest{
-		Model: gollm.ModelGrok3,
+		Model: gollm.ModelGrok4_1FastReasoning,
 		Messages: []gollm.Message{
 			{
 				Role:    gollm.RoleUser,
@@ -128,7 +128,7 @@ func demonstrateSystemMessage(apiKey string) error {
 	defer client.Close()
 
 	response, err := client.CreateChatCompletion(context.Background(), &gollm.ChatCompletionRequest{
-		Model: gollm.ModelGrok3,
+		Model: gollm.ModelGrok4_1FastReasoning,
 		Messages: []gollm.Message{
 			{
 				Role:    gollm.RoleSystem,
