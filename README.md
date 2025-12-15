@@ -172,8 +172,8 @@ client, err := gollm.NewClient(gollm.ClientConfig{
 
 ### X.AI (Grok)
 
-- **Models**: Grok-3, Grok-3-Mini, Grok-2, Grok-2-Vision
-- **Features**: Chat completions, streaming, OpenAI-compatible API
+- **Models**: Grok-4.1-Fast (Reasoning/Non-Reasoning), Grok-4 (0709), Grok-4-Fast (Reasoning/Non-Reasoning), Grok-Code-Fast, Grok-3, Grok-3-Mini, Grok-2, Grok-2-Vision
+- **Features**: Chat completions, streaming, OpenAI-compatible API, 2M context window (4.1/4-Fast models)
 
 ```go
 client, err := gollm.NewClient(gollm.ClientConfig{
@@ -592,7 +592,7 @@ To add a built-in provider to the core library, follow the same structure as exi
 | Anthropic | Claude-Opus-4.1, Claude-Opus-4, Claude-Sonnet-4, Claude-3.7-Sonnet, Claude-3.5-Haiku | Chat, Streaming, System messages |
 | Gemini | Gemini-2.5-Pro, Gemini-2.5-Flash, Gemini-1.5-Pro, Gemini-1.5-Flash | Chat, Streaming |
 | Bedrock | Claude models, Titan models | Chat, Multiple model families |
-| X.AI | Grok-3, Grok-3-Mini, Grok-2, Grok-2-Vision | Chat, Streaming, OpenAI-compatible |
+| X.AI | Grok-4.1-Fast, Grok-4, Grok-4-Fast, Grok-Code-Fast, Grok-3, Grok-3-Mini, Grok-2 | Chat, Streaming, 2M context, Tool calling |
 | Ollama | Llama 3, Mistral, CodeLlama, Gemma, Qwen2.5, DeepSeek-Coder | Chat, Streaming, Local inference |
 
 ## 🚨 Error Handling

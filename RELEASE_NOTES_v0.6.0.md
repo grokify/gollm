@@ -39,8 +39,22 @@ Complete implementation of X.AI's Grok API with OpenAI-compatible interface.
 - `examples/xai/main.go` - Usage examples (161 lines)
 
 **Supported Models:**
-- `grok-3` - Latest Grok model
+
+**Grok 4.1 (Latest - November 2025):**
+- `grok-4-1-fast-reasoning` - Best tool-calling model with 2M context window
+- `grok-4-1-fast-non-reasoning` - Instant responses with 2M context window
+
+**Grok 4 (July 2025):**
+- `grok-4-0709` - Flagship model with 256K context
+- `grok-4-fast-reasoning` - Fast reasoning with 2M context
+- `grok-4-fast-non-reasoning` - Fast non-reasoning with 2M context
+- `grok-code-fast-1` - Coding-optimized model with 256K context
+
+**Grok 3:**
+- `grok-3` - Grok 3 model
 - `grok-3-mini` - Smaller, faster variant
+
+**Grok 2:**
 - `grok-2-1212` - Grok 2 (December 2024)
 - `grok-2-vision-1212` - Grok 2 with vision capabilities
 
@@ -55,7 +69,10 @@ client, err := gollm.NewClient(gollm.ClientConfig{
 **Constants Added:**
 - `ProviderNameXAI` - Provider identifier
 - `EnvVarXAIAPIKey` - Environment variable constant
-- `ModelGrok3`, `ModelGrok3Mini`, `ModelGrok2_1212`, `ModelGrok2_Vision`
+- Grok 4.1 Models: `ModelGrok4_1FastReasoning`, `ModelGrok4_1FastNonReasoning`
+- Grok 4 Models: `ModelGrok4_0709`, `ModelGrok4FastReasoning`, `ModelGrok4FastNonReasoning`, `ModelGrokCodeFast1`
+- Grok 3 Models: `ModelGrok3`, `ModelGrok3Mini`
+- Grok 2 Models: `ModelGrok2_1212`, `ModelGrok2_Vision`
 
 ### 2. Anthropic Streaming Implementation
 
@@ -230,6 +247,13 @@ XAI_API_KEY=key go test ./providers/xai -v
 3. **Memory Function Improvements**
    - Updated `memory.go` with better type safety (18 lines modified)
 
+4. **X.AI Grok 4 Model Support** ⭐ NEW
+   - Added 6 new Grok 4/4.1 model constants
+   - Grok 4.1 Fast: Latest with 2M context window and tool calling
+   - Grok 4 Fast: 2M context with reasoning/non-reasoning modes
+   - Grok Code Fast: Optimized for coding tasks (256K context)
+   - Updated examples and tests to use `grok-4-1-fast-reasoning`
+
 ### Documentation
 
 1. **README.md Updates** (166 lines modified)
@@ -251,7 +275,7 @@ XAI_API_KEY=key go test ./providers/xai -v
    | Anthropic  | Claude-Opus-4.1, Sonnet-4, ...  | Chat, Streaming, System messages  |
    | Gemini     | Gemini-2.5-Pro, 2.5-Flash, ...  | Chat, Streaming                   |
    | Bedrock    | Claude models, Titan models      | Chat, Multiple model families     |
-   | X.AI       | Grok-3, Grok-3-Mini, Grok-2, ... | Chat, Streaming, OpenAI-compatible|
+   | X.AI       | Grok-4.1-Fast, Grok-4, Grok-4-Fast, Grok-Code-Fast, Grok-3, Grok-2 | Chat, Streaming, 2M context, Tool calling |
    | Ollama     | Llama 3, Mistral, Gemma, ...    | Chat, Streaming, Local inference  |
    ```
 
@@ -307,9 +331,10 @@ All changes are additive:
    - Fixed ineffectual assignment in `anthropic/anthropic.go:189`
    - Removed unused field `streamChunkIndex` in `client_test.go:20`
 
-3. **Model Deprecation**
-   - Updated X.AI default model from deprecated `grok-beta` to `grok-3`
-   - Added deprecation markers for old model constants
+3. **Model Updates**
+   - Updated X.AI examples and tests to use latest `grok-4-1-fast-reasoning` model
+   - Added support for Grok 4 and Grok 4.1 model families (6 new model constants)
+   - Added deprecation markers for `grok-beta` and `grok-vision-beta`
 
 ---
 
