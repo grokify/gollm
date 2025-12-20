@@ -6,7 +6,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.32.6
 	github.com/aws/aws-sdk-go-v2/service/bedrockruntime v1.47.1
 	github.com/grokify/sogo v0.13.0
-	google.golang.org/genai v1.39.0
+	google.golang.org/genai v1.40.0
 )
 
 require (
