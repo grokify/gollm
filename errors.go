@@ -8,6 +8,7 @@ import (
 var (
 	// Common errors
 	ErrUnsupportedProvider  = errors.New("unsupported provider")
+	ErrBedrockExternal      = errors.New("bedrock provider moved to github.com/grokify/fluxllm-bedrock; use CustomProvider to inject it")
 	ErrInvalidConfiguration = errors.New("invalid configuration")
 	ErrEmptyAPIKey          = errors.New("API key cannot be empty")
 	ErrEmptyModel           = errors.New("model cannot be empty")

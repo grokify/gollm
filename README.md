@@ -6,11 +6,11 @@
 [![Docs][docs-godoc-svg]][docs-godoc-url]
 [![License][license-svg]][license-url]
 
-FluxLLM is a unified Go SDK that provides a consistent interface for interacting with multiple Large Language Model (LLM) providers including OpenAI, Anthropic (Claude), Google Gemini, AWS Bedrock, X.AI (Grok), and Ollama. It implements the Chat Completions API pattern and offers both synchronous and streaming capabilities.
+FluxLLM is a unified Go SDK that provides a consistent interface for interacting with multiple Large Language Model (LLM) providers including OpenAI, Anthropic (Claude), Google Gemini, X.AI (Grok), and Ollama. It implements the Chat Completions API pattern and offers both synchronous and streaming capabilities. Additional providers like AWS Bedrock are available as [external modules](#external-providers).
 
 ## ✨ Features
 
-- **🔌 Multi-Provider Support**: OpenAI, Anthropic (Claude), Google Gemini, AWS Bedrock, X.AI (Grok), and Ollama
+- **🔌 Multi-Provider Support**: OpenAI, Anthropic (Claude), Google Gemini, X.AI (Grok), Ollama, plus [external providers](#external-providers) (AWS Bedrock, etc.)
 - **🎯 Unified API**: Same interface across all providers
 - **📡 Streaming Support**: Real-time response streaming for all providers
 - **🧠 Conversation Memory**: Persistent conversation history using Key-Value Stores
@@ -51,7 +51,6 @@ fluxllm/
 │   │   ├── adapter.go   # provider.Provider implementation
 │   │   └── *_test.go    # Provider and integration tests
 │   ├── gemini/          # Google Gemini implementation
-│   ├── bedrock/         # AWS Bedrock implementation
 │   ├── xai/             # X.AI Grok implementation
 │   └── ollama/          # Ollama implementation
 └── testing/             # 🧪 Test utilities
@@ -161,17 +160,33 @@ client, err := fluxllm.NewClient(fluxllm.ClientConfig{
 })
 ```
 
-### AWS Bedrock
+### AWS Bedrock (External Provider)
 
-- **Models**: Anthropic Claude models, Amazon Titan
-- **Features**: AWS IAM-based authentication, multiple model families
+AWS Bedrock is available as an external module to avoid pulling AWS SDK dependencies for users who don't need it.
+
+```bash
+go get github.com/grokify/fluxllm-bedrock
+```
 
 ```go
+import (
+    "github.com/grokify/fluxllm"
+    "github.com/grokify/fluxllm-bedrock"
+)
+
+// Create the Bedrock provider
+bedrockProvider, err := bedrock.NewProvider("us-east-1")
+if err != nil {
+    log.Fatal(err)
+}
+
+// Use it with fluxllm via CustomProvider
 client, err := fluxllm.NewClient(fluxllm.ClientConfig{
-    Provider: fluxllm.ProviderNameBedrock,
-    Region:   "us-east-1", // AWS region
+    CustomProvider: bedrockProvider,
 })
 ```
+
+See [External Providers](#external-providers) for more details.
 
 ### X.AI (Grok)
 
@@ -197,6 +212,57 @@ client, err := fluxllm.NewClient(fluxllm.ClientConfig{
     BaseURL:  "http://localhost:11434", // default Ollama endpoint
 })
 ```
+
+## 🔌 External Providers
+
+Some providers with heavy SDK dependencies are available as separate modules to keep the core library lightweight. These are injected via `ClientConfig.CustomProvider`.
+
+| Provider | Module | Why External |
+|----------|--------|--------------|
+| AWS Bedrock | [github.com/grokify/fluxllm-bedrock](https://github.com/grokify/fluxllm-bedrock) | AWS SDK v2 adds 17+ transitive dependencies |
+
+### Using External Providers
+
+```go
+import (
+    "github.com/grokify/fluxllm"
+    "github.com/grokify/fluxllm-bedrock"  // or your custom provider
+)
+
+// Create the external provider
+provider, err := bedrock.NewProvider("us-east-1")
+if err != nil {
+    log.Fatal(err)
+}
+
+// Inject via CustomProvider
+client, err := fluxllm.NewClient(fluxllm.ClientConfig{
+    CustomProvider: provider,
+})
+```
+
+### Creating Your Own External Provider
+
+External providers implement the `provider.Provider` interface:
+
+```go
+import "github.com/grokify/fluxllm/provider"
+
+type MyProvider struct{}
+
+func (p *MyProvider) Name() string { return "myprovider" }
+func (p *MyProvider) Close() error { return nil }
+
+func (p *MyProvider) CreateChatCompletion(ctx context.Context, req *provider.ChatCompletionRequest) (*provider.ChatCompletionResponse, error) {
+    // Your implementation
+}
+
+func (p *MyProvider) CreateChatCompletionStream(ctx context.Context, req *provider.ChatCompletionRequest) (provider.ChatCompletionStream, error) {
+    // Your streaming implementation
+}
+```
+
+See the [fluxllm-bedrock](https://github.com/grokify/fluxllm-bedrock) source code as a reference implementation.
 
 ## 📡 Streaming Example
 
@@ -581,7 +647,6 @@ go run examples/custom_provider/main.go
 - `ANTHROPIC_API_KEY`: Your Anthropic API key
 - `GEMINI_API_KEY`: Your Google Gemini API key
 - `XAI_API_KEY`: Your X.AI API key
-- AWS credentials for Bedrock (via AWS CLI/SDK configuration)
 
 ### Advanced Configuration
 
@@ -811,9 +876,11 @@ To add a built-in provider to the core library, follow the same structure as exi
 | OpenAI | GPT-5, GPT-4.1, GPT-4o, GPT-4o-mini, GPT-4-turbo, GPT-3.5-turbo | Chat, Streaming, Functions |
 | Anthropic | Claude-Opus-4.1, Claude-Opus-4, Claude-Sonnet-4, Claude-3.7-Sonnet, Claude-3.5-Haiku | Chat, Streaming, System messages |
 | Gemini | Gemini-2.5-Pro, Gemini-2.5-Flash, Gemini-1.5-Pro, Gemini-1.5-Flash | Chat, Streaming |
-| Bedrock | Claude models, Titan models | Chat, Multiple model families |
 | X.AI | Grok-4.1-Fast, Grok-4, Grok-4-Fast, Grok-Code-Fast, Grok-3, Grok-3-Mini, Grok-2 | Chat, Streaming, 2M context, Tool calling |
 | Ollama | Llama 3, Mistral, CodeLlama, Gemma, Qwen2.5, DeepSeek-Coder | Chat, Streaming, Local inference |
+| Bedrock* | Claude models, Titan models | Chat, Multiple model families |
+
+*Available as [external module](https://github.com/grokify/fluxllm-bedrock)
 
 ## 🚨 Error Handling
 

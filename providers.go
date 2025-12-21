@@ -3,7 +3,6 @@ package fluxllm
 import (
 	"github.com/grokify/fluxllm/provider"
 	"github.com/grokify/fluxllm/providers/anthropic"
-	"github.com/grokify/fluxllm/providers/bedrock"
 	"github.com/grokify/fluxllm/providers/gemini"
 	"github.com/grokify/fluxllm/providers/ollama"
 	"github.com/grokify/fluxllm/providers/openai"
@@ -24,11 +23,6 @@ func newAnthropicProvider(config ClientConfig) (provider.Provider, error) {
 		return nil, ErrEmptyAPIKey
 	}
 	return anthropic.NewProvider(config.APIKey, config.BaseURL, config.HTTPClient), nil
-}
-
-// newBedrockProvider creates a new Bedrock provider adapter
-func newBedrockProvider(config ClientConfig) (provider.Provider, error) {
-	return bedrock.NewProvider(config.Region)
 }
 
 // newOllamaProvider creates a new Ollama provider adapter

@@ -70,7 +70,7 @@ func NewClient(config ClientConfig) (*ChatClient, error) {
 		case ProviderNameAnthropic:
 			prov, err = newAnthropicProvider(config)
 		case ProviderNameBedrock:
-			prov, err = newBedrockProvider(config)
+			return nil, ErrBedrockExternal
 		case ProviderNameOllama:
 			prov, err = newOllamaProvider(config)
 		case ProviderNameGemini:
