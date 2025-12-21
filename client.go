@@ -13,25 +13,6 @@ import (
 	"github.com/grokify/fluxllm/provider"
 )
 
-// loggerKey is the context key for storing a request-scoped logger
-type loggerKey struct{}
-
-// ContextWithLogger returns a new context with the given logger attached.
-// Use this to pass request-scoped loggers (with trace IDs, user IDs, etc.)
-// that will be used for logging within that request.
-func ContextWithLogger(ctx context.Context, logger *slog.Logger) context.Context {
-	return context.WithValue(ctx, loggerKey{}, logger)
-}
-
-// LoggerFromContext returns the logger from context if present,
-// otherwise returns the fallback logger.
-func LoggerFromContext(ctx context.Context, fallback *slog.Logger) *slog.Logger {
-	if logger, ok := ctx.Value(loggerKey{}).(*slog.Logger); ok && logger != nil {
-		return logger
-	}
-	return fallback
-}
-
 // ChatClient is the main client interface that wraps a Provider
 type ChatClient struct {
 	provider provider.Provider
@@ -228,7 +209,7 @@ func (c *ChatClient) CreateChatCompletionWithMemory(ctx context.Context, session
 		messagesToSave := append(req.Messages, response.Choices[0].Message)
 		err = c.memory.AppendMessages(ctx, sessionID, messagesToSave)
 		if err != nil {
-			c.logger.Error("failed to save conversation to memory",
+			slogutil.LoggerFromContext(ctx, c.logger).Error("failed to save conversation to memory",
 				slog.String("session_id", sessionID),
 				slog.String("error", err.Error()))
 		}
@@ -377,7 +358,7 @@ func (s *memoryAwareStream) saveBufferedResponse() {
 		messagesToSave := append(s.reqMessages, assistantMessage)
 		err := s.memory.AppendMessages(s.ctx, s.sessionID, messagesToSave)
 		if err != nil {
-			s.logger.Error("failed to save streaming response to memory",
+			slogutil.LoggerFromContext(s.ctx, s.logger).Error("failed to save streaming response to memory",
 				slog.String("session_id", s.sessionID),
 				slog.String("error", err.Error()))
 		}

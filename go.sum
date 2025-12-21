@@ -55,8 +55,8 @@ github.com/googleapis/gax-go/v2 v2.16.0 h1:iHbQmKLLZrexmb0OSsNGTeSTS0HO4YvFOG8g5
 github.com/googleapis/gax-go/v2 v2.16.0/go.mod h1:o1vfQjjNZn4+dPnRdl/4ZD7S9414Y4xA+a/6Icj6l14=
 github.com/gorilla/websocket v1.5.3 h1:saDtZ6Pbx/0u+bgYQ3q96pZgCzfhKXGPqt7kZ72aNNg=
 github.com/gorilla/websocket v1.5.3/go.mod h1:YR8l580nyteQvAITg2hZ9XVh4b55+EU/adAjf1fMHhE=
-github.com/grokify/mogo v0.72.4 h1:zOjBfQ98pC6cFi+kD+I4vg5ucAwcpCvHU7uqjp1TOY8=
-github.com/grokify/mogo v0.72.4/go.mod h1:vHAL2gTwcw1a4C+XOIu2fySerZFE860iCPKYVR5b/ms=
+github.com/grokify/mogo v0.72.5 h1:1nq2bCcGovhiNxvSk9AGrjBQP9N7XHCTQRsw3lMTEMU=
+github.com/grokify/mogo v0.72.5/go.mod h1:vHAL2gTwcw1a4C+XOIu2fySerZFE860iCPKYVR5b/ms=
 github.com/grokify/sogo v0.13.0 h1:uTsSYb8ESdl+BC0hxbaexmZLTe2t1xKZ+Mzfskaa3Z4=
 github.com/grokify/sogo v0.13.0/go.mod h1:HOXcXkSUZnmtATDSCuFKsTAMd2+cDSTjE7xQy4bWv+s=
 go.opentelemetry.io/auto/sdk v1.2.1 h1:jXsnJ4Lmnqd11kwkBV2LgLoFMZKizbCi5fNZ/ipaZ64=
