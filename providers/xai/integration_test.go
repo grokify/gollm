@@ -17,7 +17,7 @@ func TestXAIIntegration_ChatCompletion(t *testing.T) {
 		t.Skip("Skipping integration test: XAI_API_KEY not set")
 	}
 
-	p := NewProvider(apiKey, "")
+	p := NewProvider(apiKey, "", nil)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -67,7 +67,7 @@ func TestXAIIntegration_Streaming(t *testing.T) {
 		t.Skip("Skipping integration test: XAI_API_KEY not set")
 	}
 
-	p := NewProvider(apiKey, "")
+	p := NewProvider(apiKey, "", nil)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -152,7 +152,7 @@ func TestXAIIntegration_ErrorHandling(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := NewProvider(apiKey, "")
+			p := NewProvider(apiKey, "", nil)
 			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer cancel()
 

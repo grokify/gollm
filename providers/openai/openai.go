@@ -21,15 +21,18 @@ type Client struct {
 }
 
 // New creates a new OpenAI client
-func New(apiKey, baseURL string) *Client {
+func New(apiKey, baseURL string, httpClient *http.Client) *Client {
 	if baseURL == "" {
 		baseURL = "https://api.openai.com/v1"
+	}
+	if httpClient == nil {
+		httpClient = &http.Client{Timeout: 30 * time.Second}
 	}
 
 	return &Client{
 		apiKey:  apiKey,
 		baseURL: baseURL,
-		client:  &http.Client{Timeout: 30 * time.Second},
+		client:  httpClient,
 	}
 }
 

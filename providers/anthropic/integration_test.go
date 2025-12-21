@@ -17,7 +17,7 @@ func TestAnthropicIntegration_ChatCompletion(t *testing.T) {
 		t.Skip("Skipping integration test: ANTHROPIC_API_KEY not set")
 	}
 
-	p := NewProvider(apiKey, "")
+	p := NewProvider(apiKey, "", nil)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -67,7 +67,7 @@ func TestAnthropicIntegration_ChatCompletionWithSystemMessage(t *testing.T) {
 		t.Skip("Skipping integration test: ANTHROPIC_API_KEY not set")
 	}
 
-	p := NewProvider(apiKey, "")
+	p := NewProvider(apiKey, "", nil)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -107,7 +107,7 @@ func TestAnthropicIntegration_Streaming(t *testing.T) {
 		t.Skip("Skipping integration test: ANTHROPIC_API_KEY not set")
 	}
 
-	p := NewProvider(apiKey, "")
+	p := NewProvider(apiKey, "", nil)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -179,7 +179,7 @@ func TestAnthropicIntegration_StreamingWithSystemMessage(t *testing.T) {
 		t.Skip("Skipping integration test: ANTHROPIC_API_KEY not set")
 	}
 
-	p := NewProvider(apiKey, "")
+	p := NewProvider(apiKey, "", nil)
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
@@ -273,7 +273,7 @@ func TestAnthropicIntegration_ErrorHandling(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := NewProvider(apiKey, "")
+			p := NewProvider(apiKey, "", nil)
 			ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 			defer cancel()
 

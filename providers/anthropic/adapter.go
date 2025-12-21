@@ -3,6 +3,7 @@ package anthropic
 
 import (
 	"context"
+	"net/http"
 	"time"
 
 	"github.com/grokify/fluxllm/provider"
@@ -14,8 +15,8 @@ type Provider struct {
 }
 
 // NewProvider creates a new Anthropic provider adapter
-func NewProvider(apiKey, baseURL string) provider.Provider {
-	client := New(apiKey, baseURL)
+func NewProvider(apiKey, baseURL string, httpClient *http.Client) provider.Provider {
+	client := New(apiKey, baseURL, httpClient)
 	return &Provider{client: client}
 }
 

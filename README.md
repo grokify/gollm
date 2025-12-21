@@ -15,6 +15,7 @@ FluxLLM is a unified Go SDK that provides a consistent interface for interacting
 - **📡 Streaming Support**: Real-time response streaming for all providers
 - **🧠 Conversation Memory**: Persistent conversation history using Key-Value Stores
 - **📊 Observability Hooks**: Extensible hooks for tracing, logging, and metrics without modifying core library
+- **🔄 Retry with Backoff**: Automatic retries for transient failures (rate limits, 5xx errors)
 - **🧪 Comprehensive Testing**: Unit tests, integration tests, and mock implementations included
 - **🔧 Extensible**: Easy to add new LLM providers
 - **📦 Modular**: Provider-specific implementations in separate packages
@@ -651,6 +652,58 @@ response, err := client.CreateChatCompletionWithMemory(ctx, sessionID, req)
 ```
 
 The context-aware logger is retrieved using `slogutil.LoggerFromContext(ctx, fallback)`, which returns the context logger if present, or falls back to the client's configured logger.
+
+### Retry with Backoff
+
+FluxLLM supports automatic retries for transient failures (rate limits, 5xx errors) via a custom HTTP client. This uses the `retryhttp` package from `github.com/grokify/mogo`.
+
+```go
+import (
+    "net/http"
+    "time"
+
+    "github.com/grokify/fluxllm"
+    "github.com/grokify/mogo/net/http/retryhttp"
+)
+
+// Create retry transport with exponential backoff
+rt := retryhttp.NewWithOptions(
+    retryhttp.WithMaxRetries(5),                           // Max 5 retries
+    retryhttp.WithInitialBackoff(500 * time.Millisecond),  // Start with 500ms
+    retryhttp.WithMaxBackoff(30 * time.Second),            // Cap at 30s
+    retryhttp.WithOnRetry(func(attempt int, req *http.Request, resp *http.Response, err error, backoff time.Duration) {
+        log.Printf("Retry attempt %d, waiting %v", attempt, backoff)
+    }),
+)
+
+// Create client with retry-enabled HTTP client
+client, err := fluxllm.NewClient(fluxllm.ClientConfig{
+    Provider: fluxllm.ProviderNameOpenAI,
+    APIKey:   os.Getenv("OPENAI_API_KEY"),
+    HTTPClient: &http.Client{
+        Transport: rt,
+        Timeout:   2 * time.Minute, // Allow time for retries
+    },
+})
+```
+
+**Retry Transport Features:**
+| Feature | Default | Description |
+|---------|---------|-------------|
+| Max Retries | 3 | Maximum retry attempts |
+| Initial Backoff | 1s | Starting backoff duration |
+| Max Backoff | 30s | Cap on backoff duration |
+| Backoff Multiplier | 2.0 | Exponential growth factor |
+| Jitter | 10% | Randomness to prevent thundering herd |
+| Retryable Status Codes | 429, 500, 502, 503, 504 | Rate limits + 5xx errors |
+
+**Additional Options:**
+- `WithRetryableStatusCodes(codes)` - Custom status codes to retry
+- `WithShouldRetry(fn)` - Custom retry decision function
+- `WithLogger(logger)` - Structured logging for retry events
+- Respects `Retry-After` headers from API responses
+
+**Provider Support:** Works with OpenAI, Anthropic, X.AI, and Ollama providers. Gemini and Bedrock use SDK clients with their own retry mechanisms.
 
 ## 🏗️ Adding New Providers
 

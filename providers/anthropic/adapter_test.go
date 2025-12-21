@@ -8,7 +8,7 @@ import (
 )
 
 func TestProvider_Name(t *testing.T) {
-	p := NewProvider("test-key", "")
+	p := NewProvider("test-key", "", nil)
 	if p.Name() != "anthropic" {
 		t.Errorf("Expected provider name 'anthropic', got '%s'", p.Name())
 	}

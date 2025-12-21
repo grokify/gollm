@@ -19,14 +19,17 @@ type Client struct {
 }
 
 // New creates a new Ollama client
-func New(baseURL string) *Client {
+func New(baseURL string, httpClient *http.Client) *Client {
 	if baseURL == "" {
 		baseURL = "http://localhost:11434"
+	}
+	if httpClient == nil {
+		httpClient = &http.Client{Timeout: 60 * time.Second} // Longer timeout for local models
 	}
 
 	return &Client{
 		baseURL: baseURL,
-		client:  &http.Client{Timeout: 60 * time.Second}, // Longer timeout for local models
+		client:  httpClient,
 	}
 }
 

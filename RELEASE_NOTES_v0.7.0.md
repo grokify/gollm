@@ -12,6 +12,8 @@ Version 0.7.0 is a major release that renames the module from `gollm` to `fluxll
 - **Observability Hooks**: New `ObservabilityHook` interface for non-invasive tracing, logging, and metrics
 - **Injectable Logging**: `*slog.Logger` support with null logger default
 - **Context-Aware Logging**: Request-scoped logging via `slogutil.ContextWithLogger`
+- **Custom HTTP Client**: Injectable `*http.Client` for retry, tracing, and custom transports
+- **Retry with Backoff**: Automatic retries for transient failures (rate limits, 5xx errors) via `retryhttp`
 - **Call Correlation**: Unique `CallID` in `LLMCallInfo` for correlating hook calls
 - **Bug Fix**: Memory-aware methods now properly invoke observability hooks
 
@@ -170,6 +172,57 @@ ctx = slogutil.ContextWithLogger(ctx, reqLogger)
 response, err := client.CreateChatCompletionWithMemory(ctx, sessionID, req)
 ```
 
+### 4. Custom HTTP Client with Retry Support
+
+FluxLLM now supports injecting a custom `*http.Client`, enabling retry with exponential backoff for transient failures (rate limits, 5xx errors), custom transports for tracing/metrics, and other HTTP-level middleware.
+
+**New Field:**
+- `ClientConfig.HTTPClient` - Optional `*http.Client` with custom transport
+
+**Usage with Retry Transport:**
+```go
+import (
+    "net/http"
+    "time"
+
+    "github.com/grokify/fluxllm"
+    "github.com/grokify/mogo/net/http/retryhttp"
+)
+
+// Create retry transport with exponential backoff
+rt := retryhttp.NewWithOptions(
+    retryhttp.WithMaxRetries(5),
+    retryhttp.WithInitialBackoff(500 * time.Millisecond),
+    retryhttp.WithMaxBackoff(30 * time.Second),
+    retryhttp.WithOnRetry(func(attempt int, req *http.Request, resp *http.Response, err error, backoff time.Duration) {
+        log.Printf("Retry attempt %d, waiting %v", attempt, backoff)
+    }),
+)
+
+// Create client with retry-enabled HTTP client
+client, err := fluxllm.NewClient(fluxllm.ClientConfig{
+    Provider: fluxllm.ProviderNameOpenAI,
+    APIKey:   os.Getenv("OPENAI_API_KEY"),
+    HTTPClient: &http.Client{
+        Transport: rt,
+        Timeout:   2 * time.Minute, // Allow time for retries
+    },
+})
+```
+
+**Retry Transport Features (via `github.com/grokify/mogo/net/http/retryhttp`):**
+- Configurable max retries (default: 3)
+- Exponential backoff with jitter (prevents thundering herd)
+- Respects `Retry-After` headers from API responses
+- Default retryable status codes: 429 (rate limit), 500, 502, 503, 504
+- Custom `ShouldRetry` function for advanced retry logic
+- `OnRetry` callback for logging/metrics
+
+**Key Benefits:**
+- **Non-breaking**: Existing code works unchanged (nil defaults to provider's default client)
+- **Flexible**: Works with any custom transport (retry, tracing, metrics, mocking)
+- **Provider Support**: Works with OpenAI, Anthropic, X.AI, and Ollama providers
+
 ---
 
 ## Bug Fixes
@@ -204,10 +257,15 @@ This ensures all LLM calls are properly observed regardless of whether memory is
 
 | File | Changes |
 |------|---------|
-| `client.go` | Added `ObservabilityHook` field, `Logger` field, hook invocations, context-aware logging |
+| `client.go` | Added `ObservabilityHook` field, `Logger` field, `HTTPClient` field, hook invocations, context-aware logging |
 | `observability.go` | **New file** - `LLMCallInfo`, `ObservabilityHook` interface, `newCallID()` |
+| `providers.go` | Updated factory functions to pass `HTTPClient` to provider constructors |
+| `providers/openai/*.go` | Added `httpClient` parameter to `New()` and `NewProvider()` |
+| `providers/anthropic/*.go` | Added `httpClient` parameter to `New()` and `NewProvider()` |
+| `providers/xai/*.go` | Added `httpClient` parameter to `New()` and `NewProvider()` |
+| `providers/ollama/*.go` | Added `httpClient` parameter to `New()` and `NewProvider()` |
 | `go.mod` | Module rename, mogo upgrade to v0.72.5 |
-| `README.md` | Renamed to FluxLLM, added Observability Hooks section, Logging Configuration, Context-Aware Logging |
+| `README.md` | Renamed to FluxLLM, added Observability Hooks, Logging, Retry with Backoff sections |
 
 ---
 
@@ -252,6 +310,7 @@ client, err := fluxllm.NewClient(fluxllm.ClientConfig{
 ### New Fields
 - `ClientConfig.ObservabilityHook` - Hook for tracing/logging/metrics
 - `ClientConfig.Logger` - Injectable `*slog.Logger`
+- `ClientConfig.HTTPClient` - Optional `*http.Client` for custom transports (retry, tracing, etc.)
 - `ChatClient.hook` - Stores the observability hook
 - `ChatClient.logger` - Stores the logger
 - `LLMCallInfo.CallID` - Unique identifier for call correlation
@@ -270,11 +329,14 @@ client, err := fluxllm.NewClient(fluxllm.ClientConfig{
 - feat: add `LLMCallInfo` with `CallID` for call correlation
 - feat: add injectable `*slog.Logger` with null logger default
 - feat: add context-aware logging via `slogutil.ContextWithLogger`
+- feat: add `ClientConfig.HTTPClient` for custom HTTP transports (retry, tracing, etc.)
+- feat: add retry with backoff support via `mogo/net/http/retryhttp`
 - fix: memory-aware methods now properly invoke observability hooks
 - docs: update README.md for FluxLLM rename
 - docs: add Observability Hooks documentation
 - docs: add Logging Configuration documentation
 - docs: add Context-Aware Logging documentation
+- docs: add Retry with Backoff documentation
 - chore: upgrade `github.com/grokify/mogo` to v0.72.5
 
 ---

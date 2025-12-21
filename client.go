@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log/slog"
+	"net/http"
 	"strings"
 	"time"
 
@@ -27,6 +28,14 @@ type ClientConfig struct {
 	APIKey   string
 	BaseURL  string
 	Region   string // For AWS Bedrock
+
+	// HTTPClient is an optional HTTP client with custom transport (e.g., retry transport).
+	// If nil, providers will use their default clients.
+	// This can be used to add retry logic, tracing, or other middleware.
+	// Example with retry:
+	//   rt := retryhttp.NewWithOptions(retryhttp.WithMaxRetries(3))
+	//   config.HTTPClient = &http.Client{Transport: rt}
+	HTTPClient *http.Client
 
 	// Memory configuration (optional)
 	Memory       kvs.Client

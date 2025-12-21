@@ -4,6 +4,7 @@ package ollama
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"time"
 
 	"github.com/grokify/fluxllm/provider"
@@ -15,8 +16,8 @@ type Provider struct {
 }
 
 // NewProvider creates a new Ollama provider adapter
-func NewProvider(baseURL string) provider.Provider {
-	client := New(baseURL)
+func NewProvider(baseURL string, httpClient *http.Client) provider.Provider {
+	client := New(baseURL, httpClient)
 	return &Provider{client: client}
 }
 

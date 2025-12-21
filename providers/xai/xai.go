@@ -21,15 +21,18 @@ type Client struct {
 }
 
 // New creates a new X.AI client
-func New(apiKey, baseURL string) *Client {
+func New(apiKey, baseURL string, httpClient *http.Client) *Client {
 	if baseURL == "" {
 		baseURL = "https://api.x.ai/v1"
+	}
+	if httpClient == nil {
+		httpClient = &http.Client{Timeout: 60 * time.Second}
 	}
 
 	return &Client{
 		apiKey:  apiKey,
 		baseURL: baseURL,
-		client:  &http.Client{Timeout: 60 * time.Second},
+		client:  httpClient,
 	}
 }
 
