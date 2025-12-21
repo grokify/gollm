@@ -14,6 +14,7 @@ GoLLM is a unified Go SDK that provides a consistent interface for interacting w
 - **🎯 Unified API**: Same interface across all providers
 - **📡 Streaming Support**: Real-time response streaming for all providers
 - **🧠 Conversation Memory**: Persistent conversation history using Key-Value Stores
+- **📊 Observability Hooks**: Extensible hooks for tracing, logging, and metrics without modifying core library
 - **🧪 Comprehensive Testing**: Unit tests, integration tests, and mock implementations included
 - **🔧 Extensible**: Easy to add new LLM providers
 - **📦 Modular**: Provider-specific implementations in separate packages
@@ -31,6 +32,7 @@ gollm/
 ├── providers.go         # Factory functions for built-in providers
 ├── types.go             # Type aliases for backward compatibility
 ├── memory.go            # Conversation memory management
+├── observability.go     # ObservabilityHook interface for tracing/logging/metrics
 ├── errors.go            # Unified error handling
 ├── *_test.go            # Comprehensive unit tests
 ├── provider/            # 🎯 Public interface package for external providers
@@ -310,6 +312,114 @@ client, err := gollm.NewClient(gollm.ClientConfig{
 })
 ```
 
+## 📊 Observability Hooks
+
+GoLLM supports observability hooks that allow you to add tracing, logging, and metrics to LLM calls without modifying the core library. This is useful for integrating with observability platforms like OpenTelemetry, Datadog, or custom monitoring solutions.
+
+### ObservabilityHook Interface
+
+```go
+// LLMCallInfo provides metadata about the LLM call
+type LLMCallInfo struct {
+    CallID       string    // Unique identifier for correlating BeforeRequest/AfterResponse
+    ProviderName string    // e.g., "openai", "anthropic"
+    StartTime    time.Time // When the call started
+}
+
+// ObservabilityHook allows external packages to observe LLM calls
+type ObservabilityHook interface {
+    // BeforeRequest is called before each LLM call.
+    // Returns a new context for trace/span propagation.
+    BeforeRequest(ctx context.Context, info LLMCallInfo, req *provider.ChatCompletionRequest) context.Context
+
+    // AfterResponse is called after each LLM call completes (success or failure).
+    AfterResponse(ctx context.Context, info LLMCallInfo, req *provider.ChatCompletionRequest, resp *provider.ChatCompletionResponse, err error)
+
+    // WrapStream wraps a stream for observability of streaming responses.
+    // Note: AfterResponse is only called if stream creation fails. For streaming
+    // completion timing, handle Close() or EOF detection in your wrapper.
+    WrapStream(ctx context.Context, info LLMCallInfo, req *provider.ChatCompletionRequest, stream provider.ChatCompletionStream) provider.ChatCompletionStream
+}
+```
+
+### Basic Usage
+
+```go
+// Create a simple logging hook
+type LoggingHook struct{}
+
+func (h *LoggingHook) BeforeRequest(ctx context.Context, info gollm.LLMCallInfo, req *gollm.ChatCompletionRequest) context.Context {
+    log.Printf("[%s] LLM call started: provider=%s model=%s", info.CallID, info.ProviderName, req.Model)
+    return ctx
+}
+
+func (h *LoggingHook) AfterResponse(ctx context.Context, info gollm.LLMCallInfo, req *gollm.ChatCompletionRequest, resp *gollm.ChatCompletionResponse, err error) {
+    duration := time.Since(info.StartTime)
+    if err != nil {
+        log.Printf("[%s] LLM call failed: provider=%s duration=%v error=%v", info.CallID, info.ProviderName, duration, err)
+    } else {
+        log.Printf("[%s] LLM call completed: provider=%s duration=%v tokens=%d", info.CallID, info.ProviderName, duration, resp.Usage.TotalTokens)
+    }
+}
+
+func (h *LoggingHook) WrapStream(ctx context.Context, info gollm.LLMCallInfo, req *gollm.ChatCompletionRequest, stream gollm.ChatCompletionStream) gollm.ChatCompletionStream {
+    return stream // Return unwrapped for simple logging, or wrap for streaming metrics
+}
+
+// Use the hook when creating a client
+client, err := gollm.NewClient(gollm.ClientConfig{
+    Provider:          gollm.ProviderNameOpenAI,
+    APIKey:            "your-api-key",
+    ObservabilityHook: &LoggingHook{},
+})
+```
+
+### OpenTelemetry Integration Example
+
+```go
+type OTelHook struct {
+    tracer trace.Tracer
+}
+
+func (h *OTelHook) BeforeRequest(ctx context.Context, info gollm.LLMCallInfo, req *gollm.ChatCompletionRequest) context.Context {
+    ctx, span := h.tracer.Start(ctx, "llm.chat_completion",
+        trace.WithAttributes(
+            attribute.String("llm.provider", info.ProviderName),
+            attribute.String("llm.model", req.Model),
+        ),
+    )
+    return ctx
+}
+
+func (h *OTelHook) AfterResponse(ctx context.Context, info gollm.LLMCallInfo, req *gollm.ChatCompletionRequest, resp *gollm.ChatCompletionResponse, err error) {
+    span := trace.SpanFromContext(ctx)
+    defer span.End()
+
+    if err != nil {
+        span.RecordError(err)
+        span.SetStatus(codes.Error, err.Error())
+    } else if resp != nil {
+        span.SetAttributes(
+            attribute.Int("llm.tokens.total", resp.Usage.TotalTokens),
+            attribute.Int("llm.tokens.prompt", resp.Usage.PromptTokens),
+            attribute.Int("llm.tokens.completion", resp.Usage.CompletionTokens),
+        )
+    }
+}
+
+func (h *OTelHook) WrapStream(ctx context.Context, info gollm.LLMCallInfo, req *gollm.ChatCompletionRequest, stream gollm.ChatCompletionStream) gollm.ChatCompletionStream {
+    return &observableStream{stream: stream, ctx: ctx, info: info}
+}
+```
+
+### Key Benefits
+
+- **Non-Invasive**: Add observability without modifying core library code
+- **Provider Agnostic**: Works with all LLM providers (OpenAI, Anthropic, Gemini, etc.)
+- **Streaming Support**: Wrap streams to observe streaming responses
+- **Context Propagation**: Pass trace context through the entire call chain
+- **Flexible**: Implement only the methods you need; all are called if the hook is set
+
 ## 🔄 Provider Switching
 
 The unified interface makes it easy to switch between providers:
@@ -484,6 +594,35 @@ config := gollm.ClientConfig{
     },
 }
 ```
+
+### Logging Configuration
+
+GoLLM supports injectable logging via Go's standard `log/slog` package. If no logger is provided, a null logger is used (no output).
+
+```go
+import (
+    "log/slog"
+    "os"
+
+    "github.com/grokify/gollm"
+)
+
+// Use a custom logger
+logger := slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{
+    Level: slog.LevelDebug,
+}))
+
+client, err := gollm.NewClient(gollm.ClientConfig{
+    Provider: gollm.ProviderNameOpenAI,
+    APIKey:   "your-api-key",
+    Logger:   logger, // Optional: defaults to null logger if not provided
+})
+
+// Access the logger if needed
+client.Logger().Info("client initialized", slog.String("provider", "openai"))
+```
+
+The logger is used internally for non-critical errors (e.g., memory save failures) that shouldn't interrupt the main request flow.
 
 ## 🏗️ Adding New Providers
 

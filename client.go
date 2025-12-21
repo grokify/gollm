@@ -3,16 +3,40 @@ package gollm
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"strings"
+	"time"
 
 	"github.com/grokify/gollm/provider"
+	"github.com/grokify/mogo/log/slogutil"
 	"github.com/grokify/sogo/database/kvs"
 )
+
+// loggerKey is the context key for storing a request-scoped logger
+type loggerKey struct{}
+
+// ContextWithLogger returns a new context with the given logger attached.
+// Use this to pass request-scoped loggers (with trace IDs, user IDs, etc.)
+// that will be used for logging within that request.
+func ContextWithLogger(ctx context.Context, logger *slog.Logger) context.Context {
+	return context.WithValue(ctx, loggerKey{}, logger)
+}
+
+// LoggerFromContext returns the logger from context if present,
+// otherwise returns the fallback logger.
+func LoggerFromContext(ctx context.Context, fallback *slog.Logger) *slog.Logger {
+	if logger, ok := ctx.Value(loggerKey{}).(*slog.Logger); ok && logger != nil {
+		return logger
+	}
+	return fallback
+}
 
 // ChatClient is the main client interface that wraps a Provider
 type ChatClient struct {
 	provider provider.Provider
 	memory   *MemoryManager
+	hook     ObservabilityHook
+	logger   *slog.Logger
 }
 
 // ClientConfig holds configuration for creating a client
@@ -28,6 +52,12 @@ type ClientConfig struct {
 
 	// Direct provider injection (for 3rd party providers)
 	CustomProvider provider.Provider
+
+	// ObservabilityHook is called before/after LLM calls (optional)
+	ObservabilityHook ObservabilityHook
+
+	// Logger for internal logging (optional, defaults to null logger)
+	Logger *slog.Logger
 
 	// Provider-specific configurations can be added here
 	Extra map[string]any
@@ -65,7 +95,17 @@ func NewClient(config ClientConfig) (*ChatClient, error) {
 		}
 	}
 
-	client := &ChatClient{provider: prov}
+	// Initialize logger (default to null logger if not provided)
+	logger := config.Logger
+	if logger == nil {
+		logger = slogutil.Null()
+	}
+
+	client := &ChatClient{
+		provider: prov,
+		hook:     config.ObservabilityHook,
+		logger:   logger,
+	}
 
 	// Initialize memory if provided
 	if config.Memory != nil {
@@ -81,12 +121,54 @@ func NewClient(config ClientConfig) (*ChatClient, error) {
 
 // CreateChatCompletion creates a chat completion
 func (c *ChatClient) CreateChatCompletion(ctx context.Context, req *provider.ChatCompletionRequest) (*provider.ChatCompletionResponse, error) {
-	return c.provider.CreateChatCompletion(ctx, req)
+	info := LLMCallInfo{
+		CallID:       newCallID(),
+		ProviderName: c.provider.Name(),
+		StartTime:    time.Now(),
+	}
+
+	// Hook: before request
+	if c.hook != nil {
+		ctx = c.hook.BeforeRequest(ctx, info, req)
+	}
+
+	resp, err := c.provider.CreateChatCompletion(ctx, req)
+
+	// Hook: after response
+	if c.hook != nil {
+		c.hook.AfterResponse(ctx, info, req, resp, err)
+	}
+
+	return resp, err
 }
 
 // CreateChatCompletionStream creates a streaming chat completion
 func (c *ChatClient) CreateChatCompletionStream(ctx context.Context, req *provider.ChatCompletionRequest) (provider.ChatCompletionStream, error) {
-	return c.provider.CreateChatCompletionStream(ctx, req)
+	info := LLMCallInfo{
+		CallID:       newCallID(),
+		ProviderName: c.provider.Name(),
+		StartTime:    time.Now(),
+	}
+
+	// Hook: before request
+	if c.hook != nil {
+		ctx = c.hook.BeforeRequest(ctx, info, req)
+	}
+
+	stream, err := c.provider.CreateChatCompletionStream(ctx, req)
+	if err != nil {
+		if c.hook != nil {
+			c.hook.AfterResponse(ctx, info, req, nil, err)
+		}
+		return nil, err
+	}
+
+	// Hook: wrap stream for observability
+	if c.hook != nil {
+		stream = c.hook.WrapStream(ctx, info, req, stream)
+	}
+
+	return stream, nil
 }
 
 // Close closes the client
@@ -109,6 +191,11 @@ func (c *ChatClient) HasMemory() bool {
 	return c.memory != nil
 }
 
+// Logger returns the client's logger
+func (c *ChatClient) Logger() *slog.Logger {
+	return c.logger
+}
+
 // CreateChatCompletionWithMemory creates a chat completion using conversation memory
 func (c *ChatClient) CreateChatCompletionWithMemory(ctx context.Context, sessionID string, req *provider.ChatCompletionRequest) (*provider.ChatCompletionResponse, error) {
 	if !c.HasMemory() {
@@ -128,8 +215,8 @@ func (c *ChatClient) CreateChatCompletionWithMemory(ctx context.Context, session
 	memoryReq := *req
 	memoryReq.Messages = allMessages
 
-	// Get response
-	response, err := c.provider.CreateChatCompletion(ctx, &memoryReq)
+	// Get response (use client method to ensure hook is called)
+	response, err := c.CreateChatCompletion(ctx, &memoryReq)
 	if err != nil {
 		return nil, err
 	}
@@ -140,8 +227,9 @@ func (c *ChatClient) CreateChatCompletionWithMemory(ctx context.Context, session
 		messagesToSave := append(req.Messages, response.Choices[0].Message)
 		err = c.memory.AppendMessages(ctx, sessionID, messagesToSave)
 		if err != nil {
-			// Log error but don't fail the request
-			// In a production environment, you might want to use a proper logger here
+			c.logger.Error("failed to save conversation to memory",
+				slog.String("session_id", sessionID),
+				slog.String("error", err.Error()))
 		}
 	}
 
@@ -167,8 +255,8 @@ func (c *ChatClient) CreateChatCompletionStreamWithMemory(ctx context.Context, s
 	memoryReq := *req
 	memoryReq.Messages = allMessages
 
-	// Get stream response
-	stream, err := c.provider.CreateChatCompletionStream(ctx, &memoryReq)
+	// Get stream response (use client method to ensure hook is called)
+	stream, err := c.CreateChatCompletionStream(ctx, &memoryReq)
 	if err != nil {
 		return nil, err
 	}
@@ -180,6 +268,7 @@ func (c *ChatClient) CreateChatCompletionStreamWithMemory(ctx context.Context, s
 		sessionID:   sessionID,
 		reqMessages: req.Messages,
 		ctx:         ctx,
+		logger:      c.logger,
 	}, nil
 }
 
@@ -238,6 +327,7 @@ type memoryAwareStream struct {
 	sessionID   string
 	reqMessages []provider.Message
 	ctx         context.Context
+	logger      *slog.Logger
 
 	// Buffer to collect the complete response
 	responseBuffer strings.Builder
@@ -286,8 +376,9 @@ func (s *memoryAwareStream) saveBufferedResponse() {
 		messagesToSave := append(s.reqMessages, assistantMessage)
 		err := s.memory.AppendMessages(s.ctx, s.sessionID, messagesToSave)
 		if err != nil {
-			// Log error but don't fail the stream
-			// In a production environment, you might want to use a proper logger here
+			s.logger.Error("failed to save streaming response to memory",
+				slog.String("session_id", s.sessionID),
+				slog.String("error", err.Error()))
 		}
 	}
 }
