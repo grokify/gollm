@@ -1,4 +1,4 @@
-module github.com/grokify/gollm
+module github.com/grokify/fluxllm
 
 go 1.24.5
 

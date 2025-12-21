@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/grokify/gollm"
+	"github.com/grokify/fluxllm"
 )
 
 func main() {
@@ -25,8 +25,8 @@ func main() {
 }
 
 func demonstrateOpenAIStreaming() error {
-	client, err := gollm.NewClient(gollm.ClientConfig{
-		Provider: gollm.ProviderNameOpenAI,
+	client, err := fluxllm.NewClient(fluxllm.ClientConfig{
+		Provider: fluxllm.ProviderNameOpenAI,
 		APIKey:   os.Getenv("OPENAI_API_KEY"),
 	})
 	if err != nil {
@@ -34,11 +34,11 @@ func demonstrateOpenAIStreaming() error {
 	}
 	defer client.Close()
 
-	stream, err := client.CreateChatCompletionStream(context.Background(), &gollm.ChatCompletionRequest{
-		Model: gollm.ModelGPT4o,
-		Messages: []gollm.Message{
+	stream, err := client.CreateChatCompletionStream(context.Background(), &fluxllm.ChatCompletionRequest{
+		Model: fluxllm.ModelGPT4o,
+		Messages: []fluxllm.Message{
 			{
-				Role:    gollm.RoleUser,
+				Role:    fluxllm.RoleUser,
 				Content: "Write a short story about a robot learning to paint. Keep it under 100 words.",
 			},
 		},
@@ -70,8 +70,8 @@ func demonstrateOpenAIStreaming() error {
 }
 
 func demonstrateAnthropicStreaming() error {
-	client, err := gollm.NewClient(gollm.ClientConfig{
-		Provider: gollm.ProviderNameAnthropic,
+	client, err := fluxllm.NewClient(fluxllm.ClientConfig{
+		Provider: fluxllm.ProviderNameAnthropic,
 		APIKey:   os.Getenv("ANTHROPIC_API_KEY"),
 	})
 	if err != nil {
@@ -79,15 +79,15 @@ func demonstrateAnthropicStreaming() error {
 	}
 	defer client.Close()
 
-	stream, err := client.CreateChatCompletionStream(context.Background(), &gollm.ChatCompletionRequest{
-		Model: gollm.ModelClaude3Haiku,
-		Messages: []gollm.Message{
+	stream, err := client.CreateChatCompletionStream(context.Background(), &fluxllm.ChatCompletionRequest{
+		Model: fluxllm.ModelClaude3Haiku,
+		Messages: []fluxllm.Message{
 			{
-				Role:    gollm.RoleSystem,
+				Role:    fluxllm.RoleSystem,
 				Content: "You are a creative writing assistant.",
 			},
 			{
-				Role:    gollm.RoleUser,
+				Role:    fluxllm.RoleUser,
 				Content: "Write a haiku about programming. Make it thoughtful and concise.",
 			},
 		},

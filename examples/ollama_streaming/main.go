@@ -6,13 +6,13 @@ import (
 	"io"
 	"log"
 
-	"github.com/grokify/gollm"
+	"github.com/grokify/fluxllm"
 )
 
 func main() {
 	// Create a client for Ollama
-	client, err := gollm.NewClient(gollm.ClientConfig{
-		Provider: gollm.ProviderNameOllama,
+	client, err := fluxllm.NewClient(fluxllm.ClientConfig{
+		Provider: fluxllm.ProviderNameOllama,
 		BaseURL:  "http://localhost:11434", // Optional - this is the default
 	})
 	if err != nil {
@@ -20,17 +20,17 @@ func main() {
 	}
 	defer client.Close()
 
-	fmt.Println("Testing Ollama streaming with GoLLM...")
+	fmt.Println("Testing Ollama streaming with FluxLLM...")
 	fmt.Println("Make sure you have Ollama running locally with a model installed.")
 	fmt.Println("Example: ollama run llama3:8b")
 	fmt.Println()
 
 	// Create a streaming chat completion request
-	stream, err := client.CreateChatCompletionStream(context.Background(), &gollm.ChatCompletionRequest{
-		Model: gollm.ModelOllamaLlama3_8B, // You can use any model you have installed
-		Messages: []gollm.Message{
+	stream, err := client.CreateChatCompletionStream(context.Background(), &fluxllm.ChatCompletionRequest{
+		Model: fluxllm.ModelOllamaLlama3_8B, // You can use any model you have installed
+		Messages: []fluxllm.Message{
 			{
-				Role:    gollm.RoleUser,
+				Role:    fluxllm.RoleUser,
 				Content: "Tell me a short story about AI assistants helping developers.",
 			},
 		},

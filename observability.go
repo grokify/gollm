@@ -1,4 +1,4 @@
-package gollm
+package fluxllm
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"encoding/hex"
 	"time"
 
-	"github.com/grokify/gollm/provider"
+	"github.com/grokify/fluxllm/provider"
 )
 
 // LLMCallInfo provides metadata about the LLM call for observability

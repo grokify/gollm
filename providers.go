@@ -1,13 +1,13 @@
-package gollm
+package fluxllm
 
 import (
-	"github.com/grokify/gollm/provider"
-	"github.com/grokify/gollm/providers/anthropic"
-	"github.com/grokify/gollm/providers/bedrock"
-	"github.com/grokify/gollm/providers/gemini"
-	"github.com/grokify/gollm/providers/ollama"
-	"github.com/grokify/gollm/providers/openai"
-	"github.com/grokify/gollm/providers/xai"
+	"github.com/grokify/fluxllm/provider"
+	"github.com/grokify/fluxllm/providers/anthropic"
+	"github.com/grokify/fluxllm/providers/bedrock"
+	"github.com/grokify/fluxllm/providers/gemini"
+	"github.com/grokify/fluxllm/providers/ollama"
+	"github.com/grokify/fluxllm/providers/openai"
+	"github.com/grokify/fluxllm/providers/xai"
 )
 
 // newOpenAIProvider creates a new OpenAI provider adapter

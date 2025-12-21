@@ -1,6 +1,6 @@
-package gollm
+package fluxllm
 
-import "github.com/grokify/gollm/models"
+import "github.com/grokify/fluxllm/models"
 
 const (
 	EnvVarAnthropicAPIKey = "ANTHROPIC_API_KEY" // #nosec G101
@@ -23,7 +23,7 @@ const (
 
 // Common model constants for each provider.
 //
-// NOTE: For new code, prefer importing "github.com/grokify/gollm/models" directly
+// NOTE: For new code, prefer importing "github.com/grokify/fluxllm/models" directly
 // for better organization and documentation. These constants are maintained for
 // backwards compatibility with existing code.
 const (

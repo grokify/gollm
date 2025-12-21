@@ -1,4 +1,4 @@
-package gollm
+package fluxllm
 
 import (
 	"context"
@@ -7,9 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/grokify/gollm/provider"
 	"github.com/grokify/mogo/log/slogutil"
 	"github.com/grokify/sogo/database/kvs"
+
+	"github.com/grokify/fluxllm/provider"
 )
 
 // loggerKey is the context key for storing a request-scoped logger

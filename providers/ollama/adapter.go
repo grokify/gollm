@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/grokify/gollm/provider"
+	"github.com/grokify/fluxllm/provider"
 )
 
 // Provider represents the Ollama provider adapter

@@ -1,4 +1,4 @@
-package gollm
+package fluxllm
 
 import (
 	"context"
@@ -23,7 +23,7 @@ func DefaultMemoryConfig() MemoryConfig {
 	return MemoryConfig{
 		MaxMessages: 50,
 		TTL:         24 * time.Hour,
-		KeyPrefix:   "gollm:session",
+		KeyPrefix:   "fluxllm:session",
 	}
 }
 

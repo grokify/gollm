@@ -1,11 +1,11 @@
-package gollm
+package fluxllm
 
 import (
 	"context"
 	"testing"
 	"time"
 
-	mocktest "github.com/grokify/gollm/testing"
+	mocktest "github.com/grokify/fluxllm/testing"
 )
 
 func TestMemoryManager_LoadConversation(t *testing.T) {
@@ -308,7 +308,7 @@ func TestDefaultMemoryConfig(t *testing.T) {
 	if config.TTL != 24*time.Hour {
 		t.Errorf("TTL = %v, want 24h", config.TTL)
 	}
-	if config.KeyPrefix != "gollm:session" {
-		t.Errorf("KeyPrefix = %s, want gollm:session", config.KeyPrefix)
+	if config.KeyPrefix != "fluxllm:session" {
+		t.Errorf("KeyPrefix = %s, want fluxllm:session", config.KeyPrefix)
 	}
 }

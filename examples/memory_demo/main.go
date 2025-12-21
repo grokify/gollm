@@ -12,7 +12,7 @@ import (
 
 	"github.com/grokify/sogo/database/kvs"
 
-	"github.com/grokify/gollm"
+	"github.com/grokify/fluxllm"
 )
 
 // mockKVS is a simple in-memory implementation of the KVS interface for demonstration
@@ -65,7 +65,7 @@ func (m *mockKVS) GetAny(ctx context.Context, key string, val any) error {
 }
 
 func main() {
-	fmt.Println("=== GoLLM Memory Demo ===")
+	fmt.Println("=== fluxllm Memory Demo ===")
 	fmt.Println("This example demonstrates conversation memory using a KVS backend.")
 	fmt.Println("Type 'quit' to exit, 'new' to start a new session, 'sessions' to list sessions")
 	fmt.Println("Note: This uses a mock in-memory KVS for demonstration.")
@@ -81,7 +81,7 @@ func runMemoryDemo() error {
 	mockKVS := newMockKVS()
 
 	// Configure memory settings
-	memoryConfig := gollm.MemoryConfig{
+	memoryConfig := fluxllm.MemoryConfig{
 		MaxMessages: 20, // Keep last 20 messages per session
 		TTL:         2 * time.Hour,
 		KeyPrefix:   "demo:session",
@@ -177,8 +177,8 @@ func runMemoryDemo() error {
 		}
 
 		// Create user message
-		userMessage := gollm.Message{
-			Role:    gollm.RoleUser,
+		userMessage := fluxllm.Message{
+			Role:    fluxllm.RoleUser,
 			Content: input,
 		}
 
@@ -186,9 +186,9 @@ func runMemoryDemo() error {
 		response, err := client.CreateChatCompletionWithMemory(
 			context.Background(),
 			currentSessionID,
-			&gollm.ChatCompletionRequest{
+			&fluxllm.ChatCompletionRequest{
 				Model:       getAvailableModel(),
-				Messages:    []gollm.Message{userMessage},
+				Messages:    []fluxllm.Message{userMessage},
 				MaxTokens:   intPtr(200),
 				Temperature: float64Ptr(0.7),
 			},
@@ -215,43 +215,43 @@ func runMemoryDemo() error {
 	return nil
 }
 
-func createClientWithMemory(kvsClient kvs.Client, memoryConfig *gollm.MemoryConfig) (*gollm.ChatClient, error) {
+func createClientWithMemory(kvsClient kvs.Client, memoryConfig *fluxllm.MemoryConfig) (*fluxllm.ChatClient, error) {
 	// Try to get API keys from environment
-	var provider gollm.ProviderName
+	var provider fluxllm.ProviderName
 	var apiKey string
 
 	if openaiKey := os.Getenv("OPENAI_API_KEY"); openaiKey != "" {
-		provider = gollm.ProviderNameOpenAI
+		provider = fluxllm.ProviderNameOpenAI
 		apiKey = openaiKey
 	} else if anthropicKey := os.Getenv("ANTHROPIC_API_KEY"); anthropicKey != "" {
-		provider = gollm.ProviderNameAnthropic
+		provider = fluxllm.ProviderNameAnthropic
 		apiKey = anthropicKey
 	} else {
 		// Fall back to Bedrock (which doesn't require API key in config)
-		provider = gollm.ProviderNameBedrock
+		provider = fluxllm.ProviderNameBedrock
 	}
 
-	config := gollm.ClientConfig{
+	config := fluxllm.ClientConfig{
 		Provider:     provider,
 		APIKey:       apiKey,
 		Memory:       kvsClient,
 		MemoryConfig: memoryConfig,
 	}
 
-	if provider == gollm.ProviderNameBedrock {
+	if provider == fluxllm.ProviderNameBedrock {
 		config.Region = "us-east-1"
 	}
 
-	return gollm.NewClient(config)
+	return fluxllm.NewClient(config)
 }
 
 func getAvailableModel() string {
 	if os.Getenv("OPENAI_API_KEY") != "" {
-		return gollm.ModelGPT4oMini
+		return fluxllm.ModelGPT4oMini
 	} else if os.Getenv("ANTHROPIC_API_KEY") != "" {
-		return gollm.ModelClaude3Haiku
+		return fluxllm.ModelClaude3Haiku
 	} else {
-		return gollm.ModelBedrockClaude3Sonnet
+		return fluxllm.ModelBedrockClaude3Sonnet
 	}
 }
 

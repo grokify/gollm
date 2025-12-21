@@ -1,4 +1,4 @@
-package gollm
+package fluxllm
 
 import (
 	"errors"

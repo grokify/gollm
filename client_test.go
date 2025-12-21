@@ -1,4 +1,4 @@
-package gollm
+package fluxllm
 
 import (
 	"context"
@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/grokify/gollm/provider"
-	mocktest "github.com/grokify/gollm/testing"
+	"github.com/grokify/fluxllm/provider"
+	mocktest "github.com/grokify/fluxllm/testing"
 )
 
 // MockProvider implements provider.Provider for testing

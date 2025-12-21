@@ -5,7 +5,7 @@ import (
 	"context"
 	"io"
 
-	"github.com/grokify/gollm/provider"
+	"github.com/grokify/fluxllm/provider"
 )
 
 // Provider represents the Gemini provider adapter

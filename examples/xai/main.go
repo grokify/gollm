@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/grokify/gollm"
+	"github.com/grokify/fluxllm"
 )
 
 func main() {
@@ -41,8 +41,8 @@ func main() {
 }
 
 func demonstrateBasicCompletion(apiKey string) error {
-	client, err := gollm.NewClient(gollm.ClientConfig{
-		Provider: gollm.ProviderNameXAI,
+	client, err := fluxllm.NewClient(fluxllm.ClientConfig{
+		Provider: fluxllm.ProviderNameXAI,
 		APIKey:   apiKey,
 	})
 	if err != nil {
@@ -50,11 +50,11 @@ func demonstrateBasicCompletion(apiKey string) error {
 	}
 	defer client.Close()
 
-	response, err := client.CreateChatCompletion(context.Background(), &gollm.ChatCompletionRequest{
-		Model: gollm.ModelGrok4_1FastReasoning,
-		Messages: []gollm.Message{
+	response, err := client.CreateChatCompletion(context.Background(), &fluxllm.ChatCompletionRequest{
+		Model: fluxllm.ModelGrok4_1FastReasoning,
+		Messages: []fluxllm.Message{
 			{
-				Role:    gollm.RoleUser,
+				Role:    fluxllm.RoleUser,
 				Content: "What makes you different from other AI assistants?",
 			},
 		},
@@ -72,8 +72,8 @@ func demonstrateBasicCompletion(apiKey string) error {
 }
 
 func demonstrateStreaming(apiKey string) error {
-	client, err := gollm.NewClient(gollm.ClientConfig{
-		Provider: gollm.ProviderNameXAI,
+	client, err := fluxllm.NewClient(fluxllm.ClientConfig{
+		Provider: fluxllm.ProviderNameXAI,
 		APIKey:   apiKey,
 	})
 	if err != nil {
@@ -83,11 +83,11 @@ func demonstrateStreaming(apiKey string) error {
 
 	fmt.Print("Grok: ")
 
-	stream, err := client.CreateChatCompletionStream(context.Background(), &gollm.ChatCompletionRequest{
-		Model: gollm.ModelGrok4_1FastReasoning,
-		Messages: []gollm.Message{
+	stream, err := client.CreateChatCompletionStream(context.Background(), &fluxllm.ChatCompletionRequest{
+		Model: fluxllm.ModelGrok4_1FastReasoning,
+		Messages: []fluxllm.Message{
 			{
-				Role:    gollm.RoleUser,
+				Role:    fluxllm.RoleUser,
 				Content: "Write a haiku about artificial intelligence.",
 			},
 		},
@@ -118,8 +118,8 @@ func demonstrateStreaming(apiKey string) error {
 }
 
 func demonstrateSystemMessage(apiKey string) error {
-	client, err := gollm.NewClient(gollm.ClientConfig{
-		Provider: gollm.ProviderNameXAI,
+	client, err := fluxllm.NewClient(fluxllm.ClientConfig{
+		Provider: fluxllm.ProviderNameXAI,
 		APIKey:   apiKey,
 	})
 	if err != nil {
@@ -127,15 +127,15 @@ func demonstrateSystemMessage(apiKey string) error {
 	}
 	defer client.Close()
 
-	response, err := client.CreateChatCompletion(context.Background(), &gollm.ChatCompletionRequest{
-		Model: gollm.ModelGrok4_1FastReasoning,
-		Messages: []gollm.Message{
+	response, err := client.CreateChatCompletion(context.Background(), &fluxllm.ChatCompletionRequest{
+		Model: fluxllm.ModelGrok4_1FastReasoning,
+		Messages: []fluxllm.Message{
 			{
-				Role:    gollm.RoleSystem,
+				Role:    fluxllm.RoleSystem,
 				Content: "You are a witty AI assistant with a good sense of humor. Keep responses concise.",
 			},
 			{
-				Role:    gollm.RoleUser,
+				Role:    fluxllm.RoleUser,
 				Content: "Tell me a programmer joke.",
 			},
 		},

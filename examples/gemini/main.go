@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/grokify/gollm"
+	"github.com/grokify/fluxllm"
 )
 
 func main() {
@@ -17,8 +17,8 @@ func main() {
 	}
 
 	// Create a Gemini client
-	client, err := gollm.NewClient(gollm.ClientConfig{
-		Provider: gollm.ProviderNameGemini,
+	client, err := fluxllm.NewClient(fluxllm.ClientConfig{
+		Provider: fluxllm.ProviderNameGemini,
 		APIKey:   apiKey,
 	})
 	if err != nil {
@@ -27,11 +27,11 @@ func main() {
 	defer client.Close()
 
 	// Create a chat completion request
-	response, err := client.CreateChatCompletion(context.Background(), &gollm.ChatCompletionRequest{
-		Model: gollm.ModelGemini1_5Flash,
-		Messages: []gollm.Message{
+	response, err := client.CreateChatCompletion(context.Background(), &fluxllm.ChatCompletionRequest{
+		Model: fluxllm.ModelGemini1_5Flash,
+		Messages: []fluxllm.Message{
 			{
-				Role:    gollm.RoleUser,
+				Role:    fluxllm.RoleUser,
 				Content: "Hello! Can you tell me a short joke?",
 			},
 		},

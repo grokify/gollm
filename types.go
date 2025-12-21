@@ -1,6 +1,6 @@
-package gollm
+package fluxllm
 
-import "github.com/grokify/gollm/provider"
+import "github.com/grokify/fluxllm/provider"
 
 // Type aliases for backward compatibility and convenience
 type Role = provider.Role

@@ -4,7 +4,7 @@ package xai
 import (
 	"context"
 
-	"github.com/grokify/gollm/provider"
+	"github.com/grokify/fluxllm/provider"
 )
 
 // Provider represents the X.AI provider adapter

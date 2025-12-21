@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/grokify/gollm"
+	"github.com/grokify/fluxllm"
 )
 
 func main() {
@@ -25,14 +25,14 @@ func main() {
 
 func runConversation() error {
 	scanner := bufio.NewScanner(os.Stdin)
-	messages := []gollm.Message{
+	messages := []fluxllm.Message{
 		{
-			Role:    gollm.RoleSystem,
+			Role:    fluxllm.RoleSystem,
 			Content: "You are a helpful assistant. Keep your responses concise and friendly.",
 		},
 	}
 
-	currentProvider := gollm.ProviderNameOpenAI
+	currentProvider := fluxllm.ProviderNameOpenAI
 	client, err := createClient(currentProvider)
 	if err != nil {
 		return err
@@ -70,13 +70,13 @@ func runConversation() error {
 		}
 
 		// Add user message
-		messages = append(messages, gollm.Message{
-			Role:    gollm.RoleUser,
+		messages = append(messages, fluxllm.Message{
+			Role:    fluxllm.RoleUser,
 			Content: input,
 		})
 
 		// Get response
-		response, err := client.CreateChatCompletion(context.Background(), &gollm.ChatCompletionRequest{
+		response, err := client.CreateChatCompletion(context.Background(), &fluxllm.ChatCompletionRequest{
 			Model:       getModelForProvider(currentProvider),
 			Messages:    messages,
 			MaxTokens:   intPtr(150),
@@ -92,8 +92,8 @@ func runConversation() error {
 		fmt.Printf("Assistant (%s): %s\n", currentProvider, assistantMessage)
 
 		// Add assistant response to conversation
-		messages = append(messages, gollm.Message{
-			Role:    gollm.RoleAssistant,
+		messages = append(messages, fluxllm.Message{
+			Role:    fluxllm.RoleAssistant,
 			Content: assistantMessage,
 		})
 
@@ -108,44 +108,44 @@ func runConversation() error {
 	return nil
 }
 
-func createClient(provider gollm.ProviderName) (*gollm.ChatClient, error) {
-	config := gollm.ClientConfig{Provider: provider}
+func createClient(provider fluxllm.ProviderName) (*fluxllm.ChatClient, error) {
+	config := fluxllm.ClientConfig{Provider: provider}
 
 	switch provider {
-	case gollm.ProviderNameOpenAI:
+	case fluxllm.ProviderNameOpenAI:
 		config.APIKey = os.Getenv("OPENAI_API_KEY")
-	case gollm.ProviderNameAnthropic:
+	case fluxllm.ProviderNameAnthropic:
 		config.APIKey = os.Getenv("ANTHROPIC_API_KEY")
-	case gollm.ProviderNameBedrock:
+	case fluxllm.ProviderNameBedrock:
 		config.Region = "us-east-1"
 	}
 
-	return gollm.NewClient(config)
+	return fluxllm.NewClient(config)
 }
 
-func getNextProvider(current gollm.ProviderName) gollm.ProviderName {
+func getNextProvider(current fluxllm.ProviderName) fluxllm.ProviderName {
 	switch current {
-	case gollm.ProviderNameOpenAI:
-		return gollm.ProviderNameAnthropic
-	case gollm.ProviderNameAnthropic:
-		return gollm.ProviderNameBedrock
-	case gollm.ProviderNameBedrock:
-		return gollm.ProviderNameOpenAI
+	case fluxllm.ProviderNameOpenAI:
+		return fluxllm.ProviderNameAnthropic
+	case fluxllm.ProviderNameAnthropic:
+		return fluxllm.ProviderNameBedrock
+	case fluxllm.ProviderNameBedrock:
+		return fluxllm.ProviderNameOpenAI
 	default:
-		return gollm.ProviderNameOpenAI
+		return fluxllm.ProviderNameOpenAI
 	}
 }
 
-func getModelForProvider(provider gollm.ProviderName) string {
+func getModelForProvider(provider fluxllm.ProviderName) string {
 	switch provider {
-	case gollm.ProviderNameOpenAI:
-		return gollm.ModelGPT4oMini
-	case gollm.ProviderNameAnthropic:
-		return gollm.ModelClaude3Haiku
-	case gollm.ProviderNameBedrock:
-		return gollm.ModelBedrockClaude3Sonnet
+	case fluxllm.ProviderNameOpenAI:
+		return fluxllm.ModelGPT4oMini
+	case fluxllm.ProviderNameAnthropic:
+		return fluxllm.ModelClaude3Haiku
+	case fluxllm.ProviderNameBedrock:
+		return fluxllm.ModelBedrockClaude3Sonnet
 	default:
-		return gollm.ModelGPT4oMini
+		return fluxllm.ModelGPT4oMini
 	}
 }
 

@@ -4,7 +4,7 @@ package openai
 import (
 	"context"
 
-	"github.com/grokify/gollm/provider"
+	"github.com/grokify/fluxllm/provider"
 )
 
 // Provider represents the OpenAI provider adapter
