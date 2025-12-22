@@ -1,4 +1,4 @@
-# FluxLLM Feature Roadmap
+# MetaLLM Feature Roadmap
 
 ## High Value
 
@@ -12,8 +12,8 @@ rt := retryhttp.NewWithOptions(
     retryhttp.WithMaxRetries(5),
     retryhttp.WithInitialBackoff(500 * time.Millisecond),
 )
-client, err := fluxllm.NewClient(fluxllm.ClientConfig{
-    Provider:   fluxllm.ProviderNameOpenAI,
+client, err := metallm.NewClient(metallm.ClientConfig{
+    Provider:   metallm.ProviderNameOpenAI,
     APIKey:     "...",
     HTTPClient: &http.Client{Transport: rt},
 })
@@ -33,9 +33,9 @@ Automatic failover when primary provider fails.
 
 ```go
 ClientConfig{
-    Provider: fluxllm.ProviderNameOpenAI,
+    Provider: metallm.ProviderNameOpenAI,
     FallbackProviders: []ProviderConfig{
-        {Provider: fluxllm.ProviderNameAnthropic, APIKey: "..."},
+        {Provider: metallm.ProviderNameAnthropic, APIKey: "..."},
     },
 }
 ```

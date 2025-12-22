@@ -1,4 +1,4 @@
-// Package ollama provides Ollama provider adapter for the gollm unified interface
+// Package ollama provides Ollama provider adapter for the MetaLLM unified interface
 package ollama
 
 import (

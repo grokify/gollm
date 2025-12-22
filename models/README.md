@@ -1,4 +1,4 @@
-# GoLLM Models Catalog
+# MetaLLM Models Catalog
 
 This package provides a comprehensive catalog of LLM model identifiers and documentation references for all supported providers.
 
@@ -14,36 +14,36 @@ This package provides a comprehensive catalog of LLM model identifiers and docum
 ### Import the Package
 
 ```go
-import "github.com/grokify/gollm/models"
+import "github.com/grokify/metallm/models"
 ```
 
 ### Use Model Constants
 
 ```go
 // Anthropic Claude
-client, _ := gollm.NewClient(gollm.ClientConfig{
-    Provider: gollm.ProviderNameAnthropic,
+client, _ := metallm.NewClient(metallm.ClientConfig{
+    Provider: metallm.ProviderNameAnthropic,
     APIKey:   apiKey,
 })
-response, _ := client.CreateChatCompletion(ctx, &gollm.ChatCompletionRequest{
+response, _ := client.CreateChatCompletion(ctx, &metallm.ChatCompletionRequest{
     Model: models.ClaudeOpus4_1,
     Messages: messages,
 })
 
 // OpenAI
-response, _ := client.CreateChatCompletion(ctx, &gollm.ChatCompletionRequest{
+response, _ := client.CreateChatCompletion(ctx, &metallm.ChatCompletionRequest{
     Model: models.GPT4o,
     Messages: messages,
 })
 
 // X.AI Grok
-response, _ := client.CreateChatCompletion(ctx, &gollm.ChatCompletionRequest{
+response, _ := client.CreateChatCompletion(ctx, &metallm.ChatCompletionRequest{
     Model: models.Grok4_1FastReasoning,
     Messages: messages,
 })
 
 // Google Gemini
-response, _ := client.CreateChatCompletion(ctx, &gollm.ChatCompletionRequest{
+response, _ := client.CreateChatCompletion(ctx, &metallm.ChatCompletionRequest{
     Model: models.Gemini2_5Pro,
     Messages: messages,
 })

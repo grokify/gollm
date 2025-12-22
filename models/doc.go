@@ -6,7 +6,7 @@
 //
 // Usage:
 //
-//	import "github.com/grokify/gollm/models"
+//	import "github.com/grokify/metallm/models"
 //
 //	// Use model constants
 //	model := models.ClaudeOpus4

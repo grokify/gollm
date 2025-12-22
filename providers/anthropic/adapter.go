@@ -1,4 +1,4 @@
-// Package anthropic provides Anthropic provider adapter for the gollm unified interface
+// Package anthropic provides Anthropic provider adapter for the MetaLLM unified interface
 package anthropic
 
 import (

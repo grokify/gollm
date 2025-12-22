@@ -308,7 +308,7 @@ func TestDefaultMemoryConfig(t *testing.T) {
 	if config.TTL != 24*time.Hour {
 		t.Errorf("TTL = %v, want 24h", config.TTL)
 	}
-	if config.KeyPrefix != "fluxllm:session" {
-		t.Errorf("KeyPrefix = %s, want fluxllm:session", config.KeyPrefix)
+	if config.KeyPrefix != "metallm:session" {
+		t.Errorf("KeyPrefix = %s, want metallm:session", config.KeyPrefix)
 	}
 }

@@ -1,4 +1,4 @@
-// Package gemini provides Google Gemini provider adapter for the gollm unified interface
+// Package gemini provides Google Gemini provider adapter for the MetaLLM unified interface
 package gemini
 
 import (

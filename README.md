@@ -25,10 +25,10 @@ MetaLLM is a unified Go SDK that provides a consistent interface for interacting
 
 ## 🏗️ Architecture
 
-FluxLLM uses a clean, modular architecture that separates concerns and enables easy extensibility:
+MetaLLM uses a clean, modular architecture that separates concerns and enables easy extensibility:
 
 ```
-fluxllm/
+metallm/
 ├── client.go            # Main ChatClient wrapper
 ├── providers.go         # Factory functions for built-in providers
 ├── types.go             # Type aliases for backward compatibility
@@ -72,7 +72,7 @@ fluxllm/
 ### Installation
 
 ```bash
-go get github.com/grokify/fluxllm
+go get github.com/grokify/metallm
 ```
 
 ### Basic Usage
@@ -85,13 +85,13 @@ import (
     "fmt"
     "log"
     
-    "github.com/grokify/fluxllm"
+    "github.com/grokify/metallm"
 )
 
 func main() {
     // Create a client for OpenAI
-    client, err := fluxllm.NewClient(fluxllm.ClientConfig{
-        Provider: fluxllm.ProviderNameOpenAI,
+    client, err := metallm.NewClient(metallm.ClientConfig{
+        Provider: metallm.ProviderNameOpenAI,
         APIKey:   "your-openai-api-key",
     })
     if err != nil {
@@ -100,11 +100,11 @@ func main() {
     defer client.Close()
 
     // Create a chat completion request
-    response, err := client.CreateChatCompletion(context.Background(), &fluxllm.ChatCompletionRequest{
-        Model: fluxllm.ModelGPT4o,
-        Messages: []fluxllm.Message{
+    response, err := client.CreateChatCompletion(context.Background(), &metallm.ChatCompletionRequest{
+        Model: metallm.ModelGPT4o,
+        Messages: []metallm.Message{
             {
-                Role:    fluxllm.RoleUser,
+                Role:    metallm.RoleUser,
                 Content: "Hello! How can you help me today?",
             },
         },
@@ -128,8 +128,8 @@ func main() {
 - **Features**: Chat completions, streaming, function calling
 
 ```go
-client, err := fluxllm.NewClient(fluxllm.ClientConfig{
-    Provider: fluxllm.ProviderNameOpenAI,
+client, err := metallm.NewClient(metallm.ClientConfig{
+    Provider: metallm.ProviderNameOpenAI,
     APIKey:   "your-openai-api-key",
     BaseURL:  "https://api.openai.com/v1", // optional
 })
@@ -141,8 +141,8 @@ client, err := fluxllm.NewClient(fluxllm.ClientConfig{
 - **Features**: Chat completions, streaming, system message support
 
 ```go
-client, err := fluxllm.NewClient(fluxllm.ClientConfig{
-    Provider: fluxllm.ProviderNameAnthropic,
+client, err := metallm.NewClient(metallm.ClientConfig{
+    Provider: metallm.ProviderNameAnthropic,
     APIKey:   "your-anthropic-api-key",
     BaseURL:  "https://api.anthropic.com", // optional
 })
@@ -154,8 +154,8 @@ client, err := fluxllm.NewClient(fluxllm.ClientConfig{
 - **Features**: Chat completions, streaming
 
 ```go
-client, err := fluxllm.NewClient(fluxllm.ClientConfig{
-    Provider: fluxllm.ProviderNameGemini,
+client, err := metallm.NewClient(metallm.ClientConfig{
+    Provider: metallm.ProviderNameGemini,
     APIKey:   "your-gemini-api-key",
 })
 ```
@@ -165,13 +165,13 @@ client, err := fluxllm.NewClient(fluxllm.ClientConfig{
 AWS Bedrock is available as an external module to avoid pulling AWS SDK dependencies for users who don't need it.
 
 ```bash
-go get github.com/grokify/fluxllm-bedrock
+go get github.com/grokify/metallm-bedrock
 ```
 
 ```go
 import (
-    "github.com/grokify/fluxllm"
-    "github.com/grokify/fluxllm-bedrock"
+    "github.com/grokify/metallm"
+    "github.com/grokify/metallm-bedrock"
 )
 
 // Create the Bedrock provider
@@ -180,8 +180,8 @@ if err != nil {
     log.Fatal(err)
 }
 
-// Use it with fluxllm via CustomProvider
-client, err := fluxllm.NewClient(fluxllm.ClientConfig{
+// Use it with metallm via CustomProvider
+client, err := metallm.NewClient(metallm.ClientConfig{
     CustomProvider: bedrockProvider,
 })
 ```
@@ -194,8 +194,8 @@ See [External Providers](#external-providers) for more details.
 - **Features**: Chat completions, streaming, OpenAI-compatible API, 2M context window (4.1/4-Fast models)
 
 ```go
-client, err := fluxllm.NewClient(fluxllm.ClientConfig{
-    Provider: fluxllm.ProviderNameXAI,
+client, err := metallm.NewClient(metallm.ClientConfig{
+    Provider: metallm.ProviderNameXAI,
     APIKey:   "your-xai-api-key",
     BaseURL:  "https://api.x.ai/v1", // optional
 })
@@ -207,8 +207,8 @@ client, err := fluxllm.NewClient(fluxllm.ClientConfig{
 - **Features**: Local inference, no API keys required, optimized for Apple Silicon
 
 ```go
-client, err := fluxllm.NewClient(fluxllm.ClientConfig{
-    Provider: fluxllm.ProviderNameOllama,
+client, err := metallm.NewClient(metallm.ClientConfig{
+    Provider: metallm.ProviderNameOllama,
     BaseURL:  "http://localhost:11434", // default Ollama endpoint
 })
 ```
@@ -219,14 +219,14 @@ Some providers with heavy SDK dependencies are available as separate modules to 
 
 | Provider | Module | Why External |
 |----------|--------|--------------|
-| AWS Bedrock | [github.com/grokify/fluxllm-bedrock](https://github.com/grokify/fluxllm-bedrock) | AWS SDK v2 adds 17+ transitive dependencies |
+| AWS Bedrock | [github.com/grokify/metallm-bedrock](https://github.com/grokify/metallm-bedrock) | AWS SDK v2 adds 17+ transitive dependencies |
 
 ### Using External Providers
 
 ```go
 import (
-    "github.com/grokify/fluxllm"
-    "github.com/grokify/fluxllm-bedrock"  // or your custom provider
+    "github.com/grokify/metallm"
+    "github.com/grokify/metallm-bedrock"  // or your custom provider
 )
 
 // Create the external provider
@@ -236,7 +236,7 @@ if err != nil {
 }
 
 // Inject via CustomProvider
-client, err := fluxllm.NewClient(fluxllm.ClientConfig{
+client, err := metallm.NewClient(metallm.ClientConfig{
     CustomProvider: provider,
 })
 ```
@@ -246,7 +246,7 @@ client, err := fluxllm.NewClient(fluxllm.ClientConfig{
 External providers implement the `provider.Provider` interface:
 
 ```go
-import "github.com/grokify/fluxllm/provider"
+import "github.com/grokify/metallm/provider"
 
 type MyProvider struct{}
 
@@ -262,16 +262,16 @@ func (p *MyProvider) CreateChatCompletionStream(ctx context.Context, req *provid
 }
 ```
 
-See the [fluxllm-bedrock](https://github.com/grokify/fluxllm-bedrock) source code as a reference implementation.
+See the [metallm-bedrock](https://github.com/grokify/metallm-bedrock) source code as a reference implementation.
 
 ## 📡 Streaming Example
 
 ```go
-stream, err := client.CreateChatCompletionStream(context.Background(), &fluxllm.ChatCompletionRequest{
-    Model: fluxllm.ModelGPT4o,
-    Messages: []fluxllm.Message{
+stream, err := client.CreateChatCompletionStream(context.Background(), &metallm.ChatCompletionRequest{
+    Model: metallm.ModelGPT4o,
+    Messages: []metallm.Message{
         {
-            Role:    fluxllm.RoleUser,
+            Role:    metallm.RoleUser,
             Content: "Tell me a short story about AI.",
         },
     },
@@ -302,21 +302,21 @@ fmt.Println()
 
 ## 🧠 Conversation Memory
 
-FluxLLM supports persistent conversation memory using any Key-Value Store that implements the [Sogo KVS interface](https://github.com/grokify/sogo/blob/master/database/kvs/definitions.go). This enables multi-turn conversations that persist across application restarts.
+MetaLLM supports persistent conversation memory using any Key-Value Store that implements the [Sogo KVS interface](https://github.com/grokify/sogo/blob/master/database/kvs/definitions.go). This enables multi-turn conversations that persist across application restarts.
 
 ### Memory Configuration
 
 ```go
 // Configure memory settings
-memoryConfig := fluxllm.MemoryConfig{
+memoryConfig := metallm.MemoryConfig{
     MaxMessages: 50,                    // Keep last 50 messages per session
     TTL:         24 * time.Hour,       // Messages expire after 24 hours
     KeyPrefix:   "myapp:conversations", // Custom key prefix
 }
 
 // Create client with memory (using Redis, DynamoDB, etc.)
-client, err := fluxllm.NewClient(fluxllm.ClientConfig{
-    Provider:     fluxllm.ProviderNameOpenAI,
+client, err := metallm.NewClient(metallm.ClientConfig{
+    Provider:     metallm.ProviderNameOpenAI,
     APIKey:       "your-api-key",
     Memory:       kvsClient,          // Your KVS implementation
     MemoryConfig: &memoryConfig,
@@ -331,10 +331,10 @@ err = client.CreateConversationWithSystemMessage(ctx, "user-123",
     "You are a helpful assistant that remembers our conversation history.")
 
 // Use memory-aware completion - automatically loads conversation history
-response, err := client.CreateChatCompletionWithMemory(ctx, "user-123", &fluxllm.ChatCompletionRequest{
-    Model: fluxllm.ModelGPT4o,
-    Messages: []fluxllm.Message{
-        {Role: fluxllm.RoleUser, Content: "What did we discuss last time?"},
+response, err := client.CreateChatCompletionWithMemory(ctx, "user-123", &metallm.ChatCompletionRequest{
+    Model: metallm.ModelGPT4o,
+    Messages: []metallm.Message{
+        {Role: metallm.RoleUser, Content: "What did we discuss last time?"},
     },
     MaxTokens: &[]int{200}[0],
 })
@@ -352,8 +352,8 @@ conversation, err := client.LoadConversation(ctx, "user-123")
 messages, err := client.GetConversationMessages(ctx, "user-123")
 
 // Manually append messages
-err = client.AppendMessage(ctx, "user-123", fluxllm.Message{
-    Role:    fluxllm.RoleUser,
+err = client.AppendMessage(ctx, "user-123", metallm.Message{
+    Role:    metallm.RoleUser,
     Content: "Remember this important fact: I prefer JSON responses.",
 })
 
@@ -372,8 +372,8 @@ Memory works with any KVS implementation:
 ```go
 // Example with Redis (using a hypothetical Redis KVS implementation)
 redisKVS := redis.NewKVSClient("localhost:6379")
-client, err := fluxllm.NewClient(fluxllm.ClientConfig{
-    Provider: fluxllm.ProviderNameOpenAI,
+client, err := metallm.NewClient(metallm.ClientConfig{
+    Provider: metallm.ProviderNameOpenAI,
     APIKey:   "your-key",
     Memory:   redisKVS,
 })
@@ -381,7 +381,7 @@ client, err := fluxllm.NewClient(fluxllm.ClientConfig{
 
 ## 📊 Observability Hooks
 
-FluxLLM supports observability hooks that allow you to add tracing, logging, and metrics to LLM calls without modifying the core library. This is useful for integrating with observability platforms like OpenTelemetry, Datadog, or custom monitoring solutions.
+MetaLLM supports observability hooks that allow you to add tracing, logging, and metrics to LLM calls without modifying the core library. This is useful for integrating with observability platforms like OpenTelemetry, Datadog, or custom monitoring solutions.
 
 ### ObservabilityHook Interface
 
@@ -415,12 +415,12 @@ type ObservabilityHook interface {
 // Create a simple logging hook
 type LoggingHook struct{}
 
-func (h *LoggingHook) BeforeRequest(ctx context.Context, info fluxllm.LLMCallInfo, req *fluxllm.ChatCompletionRequest) context.Context {
+func (h *LoggingHook) BeforeRequest(ctx context.Context, info metallm.LLMCallInfo, req *metallm.ChatCompletionRequest) context.Context {
     log.Printf("[%s] LLM call started: provider=%s model=%s", info.CallID, info.ProviderName, req.Model)
     return ctx
 }
 
-func (h *LoggingHook) AfterResponse(ctx context.Context, info fluxllm.LLMCallInfo, req *fluxllm.ChatCompletionRequest, resp *fluxllm.ChatCompletionResponse, err error) {
+func (h *LoggingHook) AfterResponse(ctx context.Context, info metallm.LLMCallInfo, req *metallm.ChatCompletionRequest, resp *metallm.ChatCompletionResponse, err error) {
     duration := time.Since(info.StartTime)
     if err != nil {
         log.Printf("[%s] LLM call failed: provider=%s duration=%v error=%v", info.CallID, info.ProviderName, duration, err)
@@ -429,13 +429,13 @@ func (h *LoggingHook) AfterResponse(ctx context.Context, info fluxllm.LLMCallInf
     }
 }
 
-func (h *LoggingHook) WrapStream(ctx context.Context, info fluxllm.LLMCallInfo, req *fluxllm.ChatCompletionRequest, stream fluxllm.ChatCompletionStream) fluxllm.ChatCompletionStream {
+func (h *LoggingHook) WrapStream(ctx context.Context, info metallm.LLMCallInfo, req *metallm.ChatCompletionRequest, stream metallm.ChatCompletionStream) metallm.ChatCompletionStream {
     return stream // Return unwrapped for simple logging, or wrap for streaming metrics
 }
 
 // Use the hook when creating a client
-client, err := fluxllm.NewClient(fluxllm.ClientConfig{
-    Provider:          fluxllm.ProviderNameOpenAI,
+client, err := metallm.NewClient(metallm.ClientConfig{
+    Provider:          metallm.ProviderNameOpenAI,
     APIKey:            "your-api-key",
     ObservabilityHook: &LoggingHook{},
 })
@@ -448,7 +448,7 @@ type OTelHook struct {
     tracer trace.Tracer
 }
 
-func (h *OTelHook) BeforeRequest(ctx context.Context, info fluxllm.LLMCallInfo, req *fluxllm.ChatCompletionRequest) context.Context {
+func (h *OTelHook) BeforeRequest(ctx context.Context, info metallm.LLMCallInfo, req *metallm.ChatCompletionRequest) context.Context {
     ctx, span := h.tracer.Start(ctx, "llm.chat_completion",
         trace.WithAttributes(
             attribute.String("llm.provider", info.ProviderName),
@@ -458,7 +458,7 @@ func (h *OTelHook) BeforeRequest(ctx context.Context, info fluxllm.LLMCallInfo, 
     return ctx
 }
 
-func (h *OTelHook) AfterResponse(ctx context.Context, info fluxllm.LLMCallInfo, req *fluxllm.ChatCompletionRequest, resp *fluxllm.ChatCompletionResponse, err error) {
+func (h *OTelHook) AfterResponse(ctx context.Context, info metallm.LLMCallInfo, req *metallm.ChatCompletionRequest, resp *metallm.ChatCompletionResponse, err error) {
     span := trace.SpanFromContext(ctx)
     defer span.End()
 
@@ -474,7 +474,7 @@ func (h *OTelHook) AfterResponse(ctx context.Context, info fluxllm.LLMCallInfo, 
     }
 }
 
-func (h *OTelHook) WrapStream(ctx context.Context, info fluxllm.LLMCallInfo, req *fluxllm.ChatCompletionRequest, stream fluxllm.ChatCompletionStream) fluxllm.ChatCompletionStream {
+func (h *OTelHook) WrapStream(ctx context.Context, info metallm.LLMCallInfo, req *metallm.ChatCompletionRequest, stream metallm.ChatCompletionStream) metallm.ChatCompletionStream {
     return &observableStream{stream: stream, ctx: ctx, info: info}
 }
 ```
@@ -493,29 +493,29 @@ The unified interface makes it easy to switch between providers:
 
 ```go
 // Same request works with any provider
-request := &fluxllm.ChatCompletionRequest{
-    Model: fluxllm.ModelGPT4o, // or fluxllm.ModelClaude3Sonnet, etc.
-    Messages: []fluxllm.Message{
-        {Role: fluxllm.RoleUser, Content: "Hello, world!"},
+request := &metallm.ChatCompletionRequest{
+    Model: metallm.ModelGPT4o, // or metallm.ModelClaude3Sonnet, etc.
+    Messages: []metallm.Message{
+        {Role: metallm.RoleUser, Content: "Hello, world!"},
     },
     MaxTokens: &[]int{100}[0],
 }
 
 // OpenAI
-openaiClient, _ := fluxllm.NewClient(fluxllm.ClientConfig{
-    Provider: fluxllm.ProviderNameOpenAI,
+openaiClient, _ := metallm.NewClient(metallm.ClientConfig{
+    Provider: metallm.ProviderNameOpenAI,
     APIKey:   "openai-key",
 })
 
-// Anthropic  
-anthropicClient, _ := fluxllm.NewClient(fluxllm.ClientConfig{
-    Provider: fluxllm.ProviderNameAnthropic,
+// Anthropic
+anthropicClient, _ := metallm.NewClient(metallm.ClientConfig{
+    Provider: metallm.ProviderNameAnthropic,
     APIKey:   "anthropic-key",
 })
 
 // Gemini
-geminiClient, _ := fluxllm.NewClient(fluxllm.ClientConfig{
-    Provider: fluxllm.ProviderNameGemini,
+geminiClient, _ := metallm.NewClient(metallm.ClientConfig{
+    Provider: metallm.ProviderNameGemini,
     APIKey:   "gemini-key",
 })
 
@@ -527,7 +527,7 @@ response3, _ := geminiClient.CreateChatCompletion(ctx, request)
 
 ## 🧪 Testing
 
-FluxLLM includes a comprehensive test suite with both unit tests and integration tests.
+MetaLLM includes a comprehensive test suite with both unit tests and integration tests.
 
 ### Running Tests
 
@@ -562,12 +562,12 @@ The clean interface design makes testing straightforward:
 // Mock the Provider interface for testing
 type mockProvider struct{}
 
-func (m *mockProvider) CreateChatCompletion(ctx context.Context, req *fluxllm.ChatCompletionRequest) (*fluxllm.ChatCompletionResponse, error) {
-    return &fluxllm.ChatCompletionResponse{
-        Choices: []fluxllm.ChatCompletionChoice{
+func (m *mockProvider) CreateChatCompletion(ctx context.Context, req *metallm.ChatCompletionRequest) (*metallm.ChatCompletionResponse, error) {
+    return &metallm.ChatCompletionResponse{
+        Choices: []metallm.ChatCompletionChoice{
             {
-                Message: fluxllm.Message{
-                    Role:    fluxllm.RoleAssistant,
+                Message: metallm.Message{
+                    Role:    metallm.RoleAssistant,
                     Content: "Mock response",
                 },
             },
@@ -575,7 +575,7 @@ func (m *mockProvider) CreateChatCompletion(ctx context.Context, req *fluxllm.Ch
     }, nil
 }
 
-func (m *mockProvider) CreateChatCompletionStream(ctx context.Context, req *fluxllm.ChatCompletionRequest) (fluxllm.ChatCompletionStream, error) {
+func (m *mockProvider) CreateChatCompletionStream(ctx context.Context, req *metallm.ChatCompletionRequest) (metallm.ChatCompletionStream, error) {
     return nil, nil
 }
 
@@ -599,16 +599,16 @@ func TestAnthropicIntegration_Streaming(t *testing.T) {
 
 ### Mock KVS for Memory Testing
 
-FluxLLM provides a mock KVS implementation for testing memory functionality:
+MetaLLM provides a mock KVS implementation for testing memory functionality:
 
 ```go
-import fluxllmtest "github.com/grokify/fluxllm/testing"
+import metallmtest "github.com/grokify/metallm/testing"
 
 // Create mock KVS for testing
-mockKVS := fluxllmtest.NewMockKVS()
+mockKVS := metallmtest.NewMockKVS()
 
-client, err := fluxllm.NewClient(fluxllm.ClientConfig{
-    Provider: fluxllm.ProviderNameOpenAI,
+client, err := metallm.NewClient(metallm.ClientConfig{
+    Provider: metallm.ProviderNameOpenAI,
     APIKey:   "test-key",
     Memory:   mockKVS,
 })
@@ -651,8 +651,8 @@ go run examples/custom_provider/main.go
 ### Advanced Configuration
 
 ```go
-config := fluxllm.ClientConfig{
-    Provider: fluxllm.ProviderNameOpenAI,
+config := metallm.ClientConfig{
+    Provider: metallm.ProviderNameOpenAI,
     APIKey:   "your-api-key",
     BaseURL:  "https://custom-endpoint.com/v1",
     Extra: map[string]any{
@@ -663,14 +663,14 @@ config := fluxllm.ClientConfig{
 
 ### Logging Configuration
 
-FluxLLM supports injectable logging via Go's standard `log/slog` package. If no logger is provided, a null logger is used (no output).
+MetaLLM supports injectable logging via Go's standard `log/slog` package. If no logger is provided, a null logger is used (no output).
 
 ```go
 import (
     "log/slog"
     "os"
 
-    "github.com/grokify/fluxllm"
+    "github.com/grokify/metallm"
 )
 
 // Use a custom logger
@@ -678,8 +678,8 @@ logger := slog.New(slog.NewJSONHandler(os.Stderr, &slog.HandlerOptions{
     Level: slog.LevelDebug,
 }))
 
-client, err := fluxllm.NewClient(fluxllm.ClientConfig{
-    Provider: fluxllm.ProviderNameOpenAI,
+client, err := metallm.NewClient(metallm.ClientConfig{
+    Provider: metallm.ProviderNameOpenAI,
     APIKey:   "your-api-key",
     Logger:   logger, // Optional: defaults to null logger if not provided
 })
@@ -692,13 +692,13 @@ The logger is used internally for non-critical errors (e.g., memory save failure
 
 ### Context-Aware Logging
 
-FluxLLM supports request-scoped logging via context. This allows you to attach trace IDs, user IDs, or other request-specific attributes to all log output within a request:
+MetaLLM supports request-scoped logging via context. This allows you to attach trace IDs, user IDs, or other request-specific attributes to all log output within a request:
 
 ```go
 import (
     "log/slog"
 
-    "github.com/grokify/fluxllm"
+    "github.com/grokify/metallm"
     "github.com/grokify/mogo/log/slogutil"
 )
 
@@ -720,14 +720,14 @@ The context-aware logger is retrieved using `slogutil.LoggerFromContext(ctx, fal
 
 ### Retry with Backoff
 
-FluxLLM supports automatic retries for transient failures (rate limits, 5xx errors) via a custom HTTP client. This uses the `retryhttp` package from `github.com/grokify/mogo`.
+MetaLLM supports automatic retries for transient failures (rate limits, 5xx errors) via a custom HTTP client. This uses the `retryhttp` package from `github.com/grokify/mogo`.
 
 ```go
 import (
     "net/http"
     "time"
 
-    "github.com/grokify/fluxllm"
+    "github.com/grokify/metallm"
     "github.com/grokify/mogo/net/http/retryhttp"
 )
 
@@ -742,8 +742,8 @@ rt := retryhttp.NewWithOptions(
 )
 
 // Create client with retry-enabled HTTP client
-client, err := fluxllm.NewClient(fluxllm.ClientConfig{
-    Provider: fluxllm.ProviderNameOpenAI,
+client, err := metallm.NewClient(metallm.ClientConfig{
+    Provider: metallm.ProviderNameOpenAI,
     APIKey:   os.Getenv("OPENAI_API_KEY"),
     HTTPClient: &http.Client{
         Transport: rt,
@@ -779,12 +779,12 @@ External packages can create providers without modifying the core library. This 
 #### Step 1: Create Your Provider Package
 
 ```go
-// In your external package (e.g., github.com/yourname/fluxllm-gemini)
+// In your external package (e.g., github.com/yourname/metallm-gemini)
 package gemini
 
 import (
     "context"
-    "github.com/grokify/fluxllm/provider"
+    "github.com/grokify/metallm/provider"
 )
 
 // Step 1: HTTP Client (like providers/openai/openai.go)
@@ -824,23 +824,23 @@ func (p *Provider) Name() string { return "gemini" }
 
 ```go
 import (
-    "github.com/grokify/fluxllm"
-    "github.com/yourname/fluxllm-gemini"
+    "github.com/grokify/metallm"
+    "github.com/yourname/metallm-gemini"
 )
 
 func main() {
     // Create your custom provider
     customProvider := gemini.NewProvider("your-api-key")
-    
-    // Inject it directly into gollm - no core modifications needed!
-    client, err := fluxllm.NewClient(fluxllm.ClientConfig{
+
+    // Inject it directly into metallm - no core modifications needed!
+    client, err := metallm.NewClient(metallm.ClientConfig{
         CustomProvider: customProvider,
     })
-    
-    // Use the same gollm API
-    response, err := client.CreateChatCompletion(ctx, &fluxllm.ChatCompletionRequest{
+
+    // Use the same metallm API
+    response, err := client.CreateChatCompletion(ctx, &metallm.ChatCompletionRequest{
         Model: "gemini-pro",
-        Messages: []fluxllm.Message{{Role: fluxllm.RoleUser, Content: "Hello!"}},
+        Messages: []metallm.Message{{Role: metallm.RoleUser, Content: "Hello!"}},
     })
 }
 ```
@@ -880,16 +880,16 @@ To add a built-in provider to the core library, follow the same structure as exi
 | Ollama | Llama 3, Mistral, CodeLlama, Gemma, Qwen2.5, DeepSeek-Coder | Chat, Streaming, Local inference |
 | Bedrock* | Claude models, Titan models | Chat, Multiple model families |
 
-*Available as [external module](https://github.com/grokify/fluxllm-bedrock)
+*Available as [external module](https://github.com/grokify/metallm-bedrock)
 
 ## 🚨 Error Handling
 
-FluxLLM provides comprehensive error handling with provider-specific context:
+MetaLLM provides comprehensive error handling with provider-specific context:
 
 ```go
 response, err := client.CreateChatCompletion(ctx, request)
 if err != nil {
-    if apiErr, ok := err.(*fluxllm.APIError); ok {
+    if apiErr, ok := err.(*metallm.APIError); ok {
         fmt.Printf("Provider: %s, Status: %d, Message: %s\n", 
             apiErr.Provider, apiErr.StatusCode, apiErr.Message)
     }
@@ -935,15 +935,15 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 **Made with ❤️ for the Go and AI community**
 
- [build-status-svg]: https://github.com/grokify/fluxllm/actions/workflows/ci.yaml/badge.svg?branch=main
- [build-status-url]: https://github.com/grokify/fluxllm/actions/workflows/ci.yaml
- [lint-status-svg]: https://github.com/grokify/fluxllm/actions/workflows/lint.yaml/badge.svg?branch=main
- [lint-status-url]: https://github.com/grokify/fluxllm/actions/workflows/lint.yaml
- [goreport-svg]: https://goreportcard.com/badge/github.com/grokify/fluxllm
- [goreport-url]: https://goreportcard.com/report/github.com/grokify/fluxllm
- [docs-godoc-svg]: https://pkg.go.dev/badge/github.com/grokify/fluxllm
- [docs-godoc-url]: https://pkg.go.dev/github.com/grokify/fluxllm
+ [build-status-svg]: https://github.com/grokify/metallm/actions/workflows/ci.yaml/badge.svg?branch=main
+ [build-status-url]: https://github.com/grokify/metallm/actions/workflows/ci.yaml
+ [lint-status-svg]: https://github.com/grokify/metallm/actions/workflows/lint.yaml/badge.svg?branch=main
+ [lint-status-url]: https://github.com/grokify/metallm/actions/workflows/lint.yaml
+ [goreport-svg]: https://goreportcard.com/badge/github.com/grokify/metallm
+ [goreport-url]: https://goreportcard.com/report/github.com/grokify/metallm
+ [docs-godoc-svg]: https://pkg.go.dev/badge/github.com/grokify/metallm
+ [docs-godoc-url]: https://pkg.go.dev/github.com/grokify/metallm
  [license-svg]: https://img.shields.io/badge/license-MIT-blue.svg
- [license-url]: https://github.com/grokify/fluxllm/blob/master/LICENSE
- [used-by-svg]: https://sourcegraph.com/github.com/grokify/fluxllm/-/badge.svg
- [used-by-url]: https://sourcegraph.com/github.com/grokify/fluxllm?badge
+ [license-url]: https://github.com/grokify/metallm/blob/master/LICENSE
+ [used-by-svg]: https://sourcegraph.com/github.com/grokify/metallm/-/badge.svg
+ [used-by-url]: https://sourcegraph.com/github.com/grokify/metallm?badge

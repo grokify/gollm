@@ -5,11 +5,11 @@ package provider
 import "context"
 
 // Provider defines the interface that all LLM providers must implement.
-// External packages can implement this interface and inject via gollm.ClientConfig.CustomProvider.
+// External packages can implement this interface and inject via metallm.ClientConfig.CustomProvider.
 //
 // Example usage in external package:
 //
-//	import "github.com/grokify/gollm/provider"
+//	import "github.com/grokify/metallm/provider"
 //
 //	func NewMyProvider(apiKey string) provider.Provider {
 //	    return &myProvider{apiKey: apiKey}

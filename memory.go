@@ -23,7 +23,7 @@ func DefaultMemoryConfig() MemoryConfig {
 	return MemoryConfig{
 		MaxMessages: 50,
 		TTL:         24 * time.Hour,
-		KeyPrefix:   "fluxllm:session",
+		KeyPrefix:   "metallm:session",
 	}
 }
 

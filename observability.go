@@ -27,7 +27,7 @@ func newCallID() string {
 
 // ObservabilityHook allows external packages to observe LLM calls.
 // Implementations can use this to add tracing, logging, or metrics
-// without modifying the core GoLLM library.
+// without modifying the core MetaLLM library.
 type ObservabilityHook interface {
 	// BeforeRequest is called before each LLM call.
 	// Returns a new context for trace/span propagation.

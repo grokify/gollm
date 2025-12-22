@@ -1,4 +1,4 @@
-// Package openai provides OpenAI provider adapter for the gollm unified interface
+// Package openai provides OpenAI provider adapter for the MetaLLM unified interface
 package openai
 
 import (

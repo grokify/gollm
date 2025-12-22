@@ -1,4 +1,4 @@
-// Package xai provides X.AI Grok provider adapter for the gollm unified interface
+// Package xai provides X.AI Grok provider adapter for the MetaLLM unified interface
 package xai
 
 import (
