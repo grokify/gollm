@@ -4,7 +4,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/grokify/fluxllm/provider"
+	"github.com/grokify/metallm/provider"
 )
 
 func TestProvider_Name(t *testing.T) {

@@ -1,4 +1,4 @@
-package fluxllm
+package metallm
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	"github.com/grokify/mogo/log/slogutil"
 	"github.com/grokify/sogo/database/kvs"
 
-	"github.com/grokify/fluxllm/provider"
+	"github.com/grokify/metallm/provider"
 )
 
 // ChatClient is the main client interface that wraps a Provider

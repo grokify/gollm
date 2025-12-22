@@ -1,11 +1,11 @@
-package fluxllm
+package metallm
 
 import (
 	"context"
 	"testing"
 	"time"
 
-	mocktest "github.com/grokify/fluxllm/testing"
+	mocktest "github.com/grokify/metallm/testing"
 )
 
 func TestMemoryManager_LoadConversation(t *testing.T) {

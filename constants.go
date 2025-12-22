@@ -1,6 +1,6 @@
-package fluxllm
+package metallm
 
-import "github.com/grokify/fluxllm/models"
+import "github.com/grokify/metallm/models"
 
 const (
 	EnvVarAnthropicAPIKey = "ANTHROPIC_API_KEY" // #nosec G101

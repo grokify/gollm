@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/grokify/fluxllm/provider"
+	"github.com/grokify/metallm/provider"
 )
 
 // Provider represents the Ollama provider adapter

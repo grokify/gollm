@@ -6,15 +6,15 @@ import (
 	"log"
 	"os"
 
-	"github.com/grokify/fluxllm"
+	"github.com/grokify/metallm"
 )
 
 // ProviderDemo holds configuration for demonstrating a specific provider
 type ProviderDemo struct {
 	Name     string
-	Config   fluxllm.ClientConfig
+	Config   metallm.ClientConfig
 	Model    string
-	Messages []fluxllm.Message
+	Messages []metallm.Message
 }
 
 func main() {
@@ -22,60 +22,60 @@ func main() {
 	demos := []ProviderDemo{
 		{
 			Name: "OpenAI",
-			Config: fluxllm.ClientConfig{
-				Provider: fluxllm.ProviderNameOpenAI,
+			Config: metallm.ClientConfig{
+				Provider: metallm.ProviderNameOpenAI,
 				APIKey:   os.Getenv("OPENAI_API_KEY"),
 			},
-			Model: fluxllm.ModelGPT4o,
-			Messages: []fluxllm.Message{
+			Model: metallm.ModelGPT4o,
+			Messages: []metallm.Message{
 				{
-					Role:    fluxllm.RoleUser,
+					Role:    metallm.RoleUser,
 					Content: "Hello! Can you explain what a unified LLM SDK is?",
 				},
 			},
 		},
 		{
 			Name: "Anthropic",
-			Config: fluxllm.ClientConfig{
-				Provider: fluxllm.ProviderNameAnthropic,
+			Config: metallm.ClientConfig{
+				Provider: metallm.ProviderNameAnthropic,
 				APIKey:   os.Getenv("ANTHROPIC_API_KEY"),
 			},
-			Model: fluxllm.ModelClaude3Sonnet,
-			Messages: []fluxllm.Message{
+			Model: metallm.ModelClaude3Sonnet,
+			Messages: []metallm.Message{
 				{
-					Role:    fluxllm.RoleSystem,
+					Role:    metallm.RoleSystem,
 					Content: "You are a helpful assistant that explains technical concepts clearly.",
 				},
 				{
-					Role:    fluxllm.RoleUser,
+					Role:    metallm.RoleUser,
 					Content: "What are the benefits of using a unified SDK for multiple LLM providers?",
 				},
 			},
 		},
 		{
 			Name: "AWS Bedrock",
-			Config: fluxllm.ClientConfig{
-				Provider: fluxllm.ProviderNameBedrock,
+			Config: metallm.ClientConfig{
+				Provider: metallm.ProviderNameBedrock,
 				Region:   "us-east-1",
 			},
-			Model: fluxllm.ModelBedrockClaude3Sonnet,
-			Messages: []fluxllm.Message{
+			Model: metallm.ModelBedrockClaude3Sonnet,
+			Messages: []metallm.Message{
 				{
-					Role:    fluxllm.RoleUser,
+					Role:    metallm.RoleUser,
 					Content: "Explain the advantages of using AWS Bedrock for LLM deployments.",
 				},
 			},
 		},
 		{
 			Name: "Ollama (Local)",
-			Config: fluxllm.ClientConfig{
-				Provider: fluxllm.ProviderNameOllama,
+			Config: metallm.ClientConfig{
+				Provider: metallm.ProviderNameOllama,
 				BaseURL:  "http://localhost:11434",
 			},
 			Model: "llama3", // Use the model name as it appears in "ollama list"
-			Messages: []fluxllm.Message{
+			Messages: []metallm.Message{
 				{
-					Role:    fluxllm.RoleUser,
+					Role:    metallm.RoleUser,
 					Content: "What are the benefits of running LLMs locally with Ollama?",
 				},
 			},
@@ -94,13 +94,13 @@ func main() {
 
 // demonstrateProvider is a generic function that works with any provider
 func demonstrateProvider(demo ProviderDemo) error {
-	client, err := fluxllm.NewClient(demo.Config)
+	client, err := metallm.NewClient(demo.Config)
 	if err != nil {
 		return err
 	}
 	defer client.Close()
 
-	response, err := client.CreateChatCompletion(context.Background(), &fluxllm.ChatCompletionRequest{
+	response, err := client.CreateChatCompletion(context.Background(), &metallm.ChatCompletionRequest{
 		Model:       demo.Model,
 		Messages:    demo.Messages,
 		MaxTokens:   intPtr(150),

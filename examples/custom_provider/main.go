@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/grokify/fluxllm"
-	"github.com/grokify/fluxllm/provider"
+	"github.com/grokify/metallm"
+	"github.com/grokify/metallm/provider"
 )
 
-// Example of a 3rd party provider implementation following fluxllm's internal pattern
-// This would be in an external package like github.com/someone/fluxllm-custom
+// Example of a 3rd party provider implementation following metallm's internal pattern
+// This would be in an external package like github.com/someone/metallm-custom
 
 // Step 1: HTTP Client (like providers/ollama/ollama.go)
 type httpClient struct {
@@ -31,7 +31,7 @@ type customProvider struct {
 	client *httpClient
 }
 
-// NewCustomProvider creates a new custom provider following fluxllm's architecture pattern
+// NewCustomProvider creates a new custom provider following metallm's architecture pattern
 // Note: Now uses the public provider.Provider interface that external packages can import
 func NewCustomProvider(name, apiKey string) provider.Provider {
 	client := newHTTPClient(name, apiKey)
@@ -82,8 +82,8 @@ func main() {
 	// Create a custom provider (this could be from an external package)
 	customProv := NewCustomProvider("MyCustomLLM", "custom-api-key")
 
-	// Inject the custom provider directly into fluxllm
-	client, err := fluxllm.NewClient(fluxllm.ClientConfig{
+	// Inject the custom provider directly into metallm
+	client, err := metallm.NewClient(metallm.ClientConfig{
 		CustomProvider: customProv, // Direct provider injection!
 		// Note: Provider field is ignored when CustomProvider is set
 	})
@@ -94,12 +94,12 @@ func main() {
 
 	fmt.Printf("Using custom provider: %s\n", client.Provider().Name())
 
-	// Use the same fluxllm API with the custom provider
-	response, err := client.CreateChatCompletion(context.Background(), &fluxllm.ChatCompletionRequest{
+	// Use the same metallm API with the custom provider
+	response, err := client.CreateChatCompletion(context.Background(), &metallm.ChatCompletionRequest{
 		Model: "custom-model-v1",
-		Messages: []fluxllm.Message{
+		Messages: []metallm.Message{
 			{
-				Role:    fluxllm.RoleUser,
+				Role:    metallm.RoleUser,
 				Content: "Hello from a 3rd party provider!",
 			},
 		},
@@ -114,7 +114,7 @@ func main() {
 	fmt.Printf("Tokens used: %d\n", response.Usage.TotalTokens)
 
 	fmt.Println()
-	fmt.Println("🎉 3rd party providers can now extend fluxllm without modifying core!")
+	fmt.Println("🎉 3rd party providers can now extend metallm without modifying core!")
 	fmt.Println("   - No registry needed")
 	fmt.Println("   - No global state")
 	fmt.Println("   - Compile-time type safety")

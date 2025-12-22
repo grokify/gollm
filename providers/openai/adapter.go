@@ -5,7 +5,7 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/grokify/fluxllm/provider"
+	"github.com/grokify/metallm/provider"
 )
 
 // Provider represents the OpenAI provider adapter

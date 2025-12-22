@@ -1,6 +1,6 @@
-package fluxllm
+package metallm
 
-import "github.com/grokify/fluxllm/provider"
+import "github.com/grokify/metallm/provider"
 
 // Type aliases for backward compatibility and convenience
 type Role = provider.Role

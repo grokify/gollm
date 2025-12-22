@@ -12,7 +12,7 @@ import (
 
 	"github.com/grokify/sogo/database/kvs"
 
-	"github.com/grokify/fluxllm"
+	"github.com/grokify/metallm"
 )
 
 // mockKVS is a simple in-memory implementation of the KVS interface for demonstration
@@ -65,7 +65,7 @@ func (m *mockKVS) GetAny(ctx context.Context, key string, val any) error {
 }
 
 func main() {
-	fmt.Println("=== fluxllm Memory Demo ===")
+	fmt.Println("=== metallm Memory Demo ===")
 	fmt.Println("This example demonstrates conversation memory using a KVS backend.")
 	fmt.Println("Type 'quit' to exit, 'new' to start a new session, 'sessions' to list sessions")
 	fmt.Println("Note: This uses a mock in-memory KVS for demonstration.")
@@ -81,7 +81,7 @@ func runMemoryDemo() error {
 	mockKVS := newMockKVS()
 
 	// Configure memory settings
-	memoryConfig := fluxllm.MemoryConfig{
+	memoryConfig := metallm.MemoryConfig{
 		MaxMessages: 20, // Keep last 20 messages per session
 		TTL:         2 * time.Hour,
 		KeyPrefix:   "demo:session",
@@ -177,8 +177,8 @@ func runMemoryDemo() error {
 		}
 
 		// Create user message
-		userMessage := fluxllm.Message{
-			Role:    fluxllm.RoleUser,
+		userMessage := metallm.Message{
+			Role:    metallm.RoleUser,
 			Content: input,
 		}
 
@@ -186,9 +186,9 @@ func runMemoryDemo() error {
 		response, err := client.CreateChatCompletionWithMemory(
 			context.Background(),
 			currentSessionID,
-			&fluxllm.ChatCompletionRequest{
+			&metallm.ChatCompletionRequest{
 				Model:       getAvailableModel(),
-				Messages:    []fluxllm.Message{userMessage},
+				Messages:    []metallm.Message{userMessage},
 				MaxTokens:   intPtr(200),
 				Temperature: float64Ptr(0.7),
 			},
@@ -215,43 +215,43 @@ func runMemoryDemo() error {
 	return nil
 }
 
-func createClientWithMemory(kvsClient kvs.Client, memoryConfig *fluxllm.MemoryConfig) (*fluxllm.ChatClient, error) {
+func createClientWithMemory(kvsClient kvs.Client, memoryConfig *metallm.MemoryConfig) (*metallm.ChatClient, error) {
 	// Try to get API keys from environment
-	var provider fluxllm.ProviderName
+	var provider metallm.ProviderName
 	var apiKey string
 
 	if openaiKey := os.Getenv("OPENAI_API_KEY"); openaiKey != "" {
-		provider = fluxllm.ProviderNameOpenAI
+		provider = metallm.ProviderNameOpenAI
 		apiKey = openaiKey
 	} else if anthropicKey := os.Getenv("ANTHROPIC_API_KEY"); anthropicKey != "" {
-		provider = fluxllm.ProviderNameAnthropic
+		provider = metallm.ProviderNameAnthropic
 		apiKey = anthropicKey
 	} else {
 		// Fall back to Bedrock (which doesn't require API key in config)
-		provider = fluxllm.ProviderNameBedrock
+		provider = metallm.ProviderNameBedrock
 	}
 
-	config := fluxllm.ClientConfig{
+	config := metallm.ClientConfig{
 		Provider:     provider,
 		APIKey:       apiKey,
 		Memory:       kvsClient,
 		MemoryConfig: memoryConfig,
 	}
 
-	if provider == fluxllm.ProviderNameBedrock {
+	if provider == metallm.ProviderNameBedrock {
 		config.Region = "us-east-1"
 	}
 
-	return fluxllm.NewClient(config)
+	return metallm.NewClient(config)
 }
 
 func getAvailableModel() string {
 	if os.Getenv("OPENAI_API_KEY") != "" {
-		return fluxllm.ModelGPT4oMini
+		return metallm.ModelGPT4oMini
 	} else if os.Getenv("ANTHROPIC_API_KEY") != "" {
-		return fluxllm.ModelClaude3Haiku
+		return metallm.ModelClaude3Haiku
 	} else {
-		return fluxllm.ModelBedrockClaude3Sonnet
+		return metallm.ModelBedrockClaude3Sonnet
 	}
 }
 

@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/grokify/fluxllm"
+	"github.com/grokify/metallm"
 )
 
 func main() {
@@ -17,8 +17,8 @@ func main() {
 	}
 
 	// Create Anthropic client
-	client, err := fluxllm.NewClient(fluxllm.ClientConfig{
-		Provider: fluxllm.ProviderNameAnthropic,
+	client, err := metallm.NewClient(metallm.ClientConfig{
+		Provider: metallm.ProviderNameAnthropic,
 		APIKey:   apiKey,
 	})
 	if err != nil {
@@ -34,11 +34,11 @@ func main() {
 	fmt.Println("Question: Explain what streaming responses are in one sentence.")
 	fmt.Print("\nClaude: ")
 
-	stream, err := client.CreateChatCompletionStream(context.Background(), &fluxllm.ChatCompletionRequest{
-		Model: fluxllm.ModelClaude3Haiku,
-		Messages: []fluxllm.Message{
+	stream, err := client.CreateChatCompletionStream(context.Background(), &metallm.ChatCompletionRequest{
+		Model: metallm.ModelClaude3Haiku,
+		Messages: []metallm.Message{
 			{
-				Role:    fluxllm.RoleUser,
+				Role:    metallm.RoleUser,
 				Content: "Explain what streaming responses are in one sentence.",
 			},
 		},
@@ -71,15 +71,15 @@ func main() {
 	fmt.Println("Task: Write a haiku about AI")
 	fmt.Print("\nClaude: ")
 
-	stream2, err := client.CreateChatCompletionStream(context.Background(), &fluxllm.ChatCompletionRequest{
-		Model: fluxllm.ModelClaude3Sonnet,
-		Messages: []fluxllm.Message{
+	stream2, err := client.CreateChatCompletionStream(context.Background(), &metallm.ChatCompletionRequest{
+		Model: metallm.ModelClaude3Sonnet,
+		Messages: []metallm.Message{
 			{
-				Role:    fluxllm.RoleSystem,
+				Role:    metallm.RoleSystem,
 				Content: "You are a creative poet who writes thoughtful and elegant haikus.",
 			},
 			{
-				Role:    fluxllm.RoleUser,
+				Role:    metallm.RoleUser,
 				Content: "Write a haiku about artificial intelligence.",
 			},
 		},
@@ -112,11 +112,11 @@ func main() {
 	fmt.Println("Question: List 5 benefits of using Go for backend development")
 	fmt.Print("\nClaude: ")
 
-	stream3, err := client.CreateChatCompletionStream(context.Background(), &fluxllm.ChatCompletionRequest{
-		Model: fluxllm.ModelClaude3Haiku,
-		Messages: []fluxllm.Message{
+	stream3, err := client.CreateChatCompletionStream(context.Background(), &metallm.ChatCompletionRequest{
+		Model: metallm.ModelClaude3Haiku,
+		Messages: []metallm.Message{
 			{
-				Role:    fluxllm.RoleUser,
+				Role:    metallm.RoleUser,
 				Content: "List 5 key benefits of using Go for backend development. Be concise.",
 			},
 		},

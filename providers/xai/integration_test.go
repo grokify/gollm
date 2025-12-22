@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/grokify/fluxllm/provider"
+	"github.com/grokify/metallm/provider"
 )
 
 // TestXAIIntegration_ChatCompletion tests actual API calls

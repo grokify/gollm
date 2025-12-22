@@ -1,4 +1,4 @@
-package fluxllm
+package metallm
 
 import (
 	"context"

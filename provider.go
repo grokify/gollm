@@ -1,6 +1,6 @@
-package fluxllm
+package metallm
 
-import "github.com/grokify/fluxllm/provider"
+import "github.com/grokify/metallm/provider"
 
 // Provider is an alias to the provider.Provider interface for backward compatibility
 type Provider = provider.Provider

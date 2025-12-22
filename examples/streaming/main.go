@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/grokify/fluxllm"
+	"github.com/grokify/metallm"
 )
 
 func main() {
@@ -25,8 +25,8 @@ func main() {
 }
 
 func demonstrateOpenAIStreaming() error {
-	client, err := fluxllm.NewClient(fluxllm.ClientConfig{
-		Provider: fluxllm.ProviderNameOpenAI,
+	client, err := metallm.NewClient(metallm.ClientConfig{
+		Provider: metallm.ProviderNameOpenAI,
 		APIKey:   os.Getenv("OPENAI_API_KEY"),
 	})
 	if err != nil {
@@ -34,11 +34,11 @@ func demonstrateOpenAIStreaming() error {
 	}
 	defer client.Close()
 
-	stream, err := client.CreateChatCompletionStream(context.Background(), &fluxllm.ChatCompletionRequest{
-		Model: fluxllm.ModelGPT4o,
-		Messages: []fluxllm.Message{
+	stream, err := client.CreateChatCompletionStream(context.Background(), &metallm.ChatCompletionRequest{
+		Model: metallm.ModelGPT4o,
+		Messages: []metallm.Message{
 			{
-				Role:    fluxllm.RoleUser,
+				Role:    metallm.RoleUser,
 				Content: "Write a short story about a robot learning to paint. Keep it under 100 words.",
 			},
 		},
@@ -70,8 +70,8 @@ func demonstrateOpenAIStreaming() error {
 }
 
 func demonstrateAnthropicStreaming() error {
-	client, err := fluxllm.NewClient(fluxllm.ClientConfig{
-		Provider: fluxllm.ProviderNameAnthropic,
+	client, err := metallm.NewClient(metallm.ClientConfig{
+		Provider: metallm.ProviderNameAnthropic,
 		APIKey:   os.Getenv("ANTHROPIC_API_KEY"),
 	})
 	if err != nil {
@@ -79,15 +79,15 @@ func demonstrateAnthropicStreaming() error {
 	}
 	defer client.Close()
 
-	stream, err := client.CreateChatCompletionStream(context.Background(), &fluxllm.ChatCompletionRequest{
-		Model: fluxllm.ModelClaude3Haiku,
-		Messages: []fluxllm.Message{
+	stream, err := client.CreateChatCompletionStream(context.Background(), &metallm.ChatCompletionRequest{
+		Model: metallm.ModelClaude3Haiku,
+		Messages: []metallm.Message{
 			{
-				Role:    fluxllm.RoleSystem,
+				Role:    metallm.RoleSystem,
 				Content: "You are a creative writing assistant.",
 			},
 			{
-				Role:    fluxllm.RoleUser,
+				Role:    metallm.RoleUser,
 				Content: "Write a haiku about programming. Make it thoughtful and concise.",
 			},
 		},

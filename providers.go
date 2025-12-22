@@ -1,12 +1,12 @@
-package fluxllm
+package metallm
 
 import (
-	"github.com/grokify/fluxllm/provider"
-	"github.com/grokify/fluxllm/providers/anthropic"
-	"github.com/grokify/fluxllm/providers/gemini"
-	"github.com/grokify/fluxllm/providers/ollama"
-	"github.com/grokify/fluxllm/providers/openai"
-	"github.com/grokify/fluxllm/providers/xai"
+	"github.com/grokify/metallm/provider"
+	"github.com/grokify/metallm/providers/anthropic"
+	"github.com/grokify/metallm/providers/gemini"
+	"github.com/grokify/metallm/providers/ollama"
+	"github.com/grokify/metallm/providers/openai"
+	"github.com/grokify/metallm/providers/xai"
 )
 
 // newOpenAIProvider creates a new OpenAI provider adapter
