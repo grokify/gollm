@@ -1,4 +1,4 @@
-package metallm
+package omnillm
 
 import (
 	"context"
@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/grokify/metallm/provider"
-	mocktest "github.com/grokify/metallm/testing"
+	"github.com/agentplexus/omnillm/provider"
+	mocktest "github.com/agentplexus/omnillm/testing"
 )
 
 // MockProvider implements provider.Provider for testing

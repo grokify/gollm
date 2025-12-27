@@ -6,7 +6,7 @@
 //
 // Usage:
 //
-//	import "github.com/grokify/metallm/models"
+//	import "github.com/agentplexus/omnillm/models"
 //
 //	// Use model constants
 //	model := models.ClaudeOpus4

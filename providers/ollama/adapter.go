@@ -1,4 +1,4 @@
-// Package ollama provides Ollama provider adapter for the MetaLLM unified interface
+// Package ollama provides Ollama provider adapter for the OmniLLM unified interface
 package ollama
 
 import (
@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/grokify/metallm/provider"
+	"github.com/agentplexus/omnillm/provider"
 )
 
 // Provider represents the Ollama provider adapter

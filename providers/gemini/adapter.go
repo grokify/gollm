@@ -1,11 +1,11 @@
-// Package gemini provides Google Gemini provider adapter for the MetaLLM unified interface
+// Package gemini provides Google Gemini provider adapter for the OmniLLM unified interface
 package gemini
 
 import (
 	"context"
 	"io"
 
-	"github.com/grokify/metallm/provider"
+	"github.com/agentplexus/omnillm/provider"
 )
 
 // Provider represents the Gemini provider adapter

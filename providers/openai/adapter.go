@@ -1,11 +1,11 @@
-// Package openai provides OpenAI provider adapter for the MetaLLM unified interface
+// Package openai provides OpenAI provider adapter for the OmniLLM unified interface
 package openai
 
 import (
 	"context"
 	"net/http"
 
-	"github.com/grokify/metallm/provider"
+	"github.com/agentplexus/omnillm/provider"
 )
 
 // Provider represents the OpenAI provider adapter

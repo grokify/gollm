@@ -1,4 +1,4 @@
-// Package anthropic provides Anthropic provider adapter for the MetaLLM unified interface
+// Package anthropic provides Anthropic provider adapter for the OmniLLM unified interface
 package anthropic
 
 import (
@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/grokify/metallm/provider"
+	"github.com/agentplexus/omnillm/provider"
 )
 
 // Provider represents the Anthropic provider adapter

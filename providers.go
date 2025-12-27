@@ -1,12 +1,12 @@
-package metallm
+package omnillm
 
 import (
-	"github.com/grokify/metallm/provider"
-	"github.com/grokify/metallm/providers/anthropic"
-	"github.com/grokify/metallm/providers/gemini"
-	"github.com/grokify/metallm/providers/ollama"
-	"github.com/grokify/metallm/providers/openai"
-	"github.com/grokify/metallm/providers/xai"
+	"github.com/agentplexus/omnillm/provider"
+	"github.com/agentplexus/omnillm/providers/anthropic"
+	"github.com/agentplexus/omnillm/providers/gemini"
+	"github.com/agentplexus/omnillm/providers/ollama"
+	"github.com/agentplexus/omnillm/providers/openai"
+	"github.com/agentplexus/omnillm/providers/xai"
 )
 
 // newOpenAIProvider creates a new OpenAI provider adapter

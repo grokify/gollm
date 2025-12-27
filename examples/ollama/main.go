@@ -5,14 +5,14 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/grokify/metallm"
+	"github.com/agentplexus/omnillm"
 )
 
 func main() {
 	// Create a client for Ollama
 	// Default BaseURL is http://localhost:11434, but you can customize it
-	client, err := metallm.NewClient(metallm.ClientConfig{
-		Provider: metallm.ProviderNameOllama,
+	client, err := omnillm.NewClient(omnillm.ClientConfig{
+		Provider: omnillm.ProviderNameOllama,
 		BaseURL:  "http://localhost:11434", // Optional - this is the default
 	})
 	if err != nil {
@@ -20,17 +20,17 @@ func main() {
 	}
 	defer client.Close()
 
-	fmt.Println("Testing Ollama provider with MetaLLM...")
+	fmt.Println("Testing Ollama provider with OmniLLM...")
 	fmt.Println("Make sure you have Ollama running locally with a model installed.")
 	fmt.Println("Example: ollama run llama3:8b")
 	fmt.Println()
 
 	// Create a chat completion request
-	response, err := client.CreateChatCompletion(context.Background(), &metallm.ChatCompletionRequest{
-		Model: metallm.ModelOllamaLlama3_8B, // You can use any model you have installed
-		Messages: []metallm.Message{
+	response, err := client.CreateChatCompletion(context.Background(), &omnillm.ChatCompletionRequest{
+		Model: omnillm.ModelOllamaLlama3_8B, // You can use any model you have installed
+		Messages: []omnillm.Message{
 			{
-				Role:    metallm.RoleUser,
+				Role:    omnillm.RoleUser,
 				Content: "Hello! Can you tell me a short fact about Apple Silicon MacBooks?",
 			},
 		},

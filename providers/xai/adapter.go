@@ -1,11 +1,11 @@
-// Package xai provides X.AI Grok provider adapter for the MetaLLM unified interface
+// Package xai provides X.AI Grok provider adapter for the OmniLLM unified interface
 package xai
 
 import (
 	"context"
 	"net/http"
 
-	"github.com/grokify/metallm/provider"
+	"github.com/agentplexus/omnillm/provider"
 )
 
 // Provider represents the X.AI provider adapter

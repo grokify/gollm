@@ -1,4 +1,4 @@
-package metallm
+package omnillm
 
 import (
 	"context"
@@ -11,7 +11,7 @@ import (
 	"github.com/grokify/mogo/log/slogutil"
 	"github.com/grokify/sogo/database/kvs"
 
-	"github.com/grokify/metallm/provider"
+	"github.com/agentplexus/omnillm/provider"
 )
 
 // ChatClient is the main client interface that wraps a Provider

@@ -4,16 +4,16 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/grokify/metallm"
+	"github.com/agentplexus/omnillm"
 )
 
 func main() {
-	fmt.Println("=== MetaLLM Provider Architecture Demo ===")
+	fmt.Println("=== OmniLLM Provider Architecture Demo ===")
 	fmt.Println()
 
 	// Show the current architecture
 	fmt.Println("Current Architecture:")
-	fmt.Println("📁 metallm/ (main package)")
+	fmt.Println("📁 omnillm/ (main package)")
 	fmt.Println("  ├── client.go        - ChatClient wrapper")
 	fmt.Println("  ├── provider.go      - Provider interface")
 	fmt.Println("  ├── providers.go     - Provider adapters")
@@ -30,8 +30,8 @@ func main() {
 	fmt.Println("Creating clients for different providers...")
 
 	// OpenAI client (won't work without real API key)
-	openaiClient, err := metallm.NewClient(metallm.ClientConfig{
-		Provider: metallm.ProviderNameOpenAI,
+	openaiClient, err := omnillm.NewClient(omnillm.ClientConfig{
+		Provider: omnillm.ProviderNameOpenAI,
 		APIKey:   "demo-openai-key",
 	})
 	if err != nil {
@@ -42,8 +42,8 @@ func main() {
 	}
 
 	// Anthropic client (won't work without real API key)
-	anthropicClient, err := metallm.NewClient(metallm.ClientConfig{
-		Provider: metallm.ProviderNameAnthropic,
+	anthropicClient, err := omnillm.NewClient(omnillm.ClientConfig{
+		Provider: omnillm.ProviderNameAnthropic,
 		APIKey:   "demo-anthropic-key",
 	})
 	if err != nil {
@@ -54,8 +54,8 @@ func main() {
 	}
 
 	// Bedrock client (requires AWS credentials)
-	bedrockClient, err := metallm.NewClient(metallm.ClientConfig{
-		Provider: metallm.ProviderNameBedrock,
+	bedrockClient, err := omnillm.NewClient(omnillm.ClientConfig{
+		Provider: omnillm.ProviderNameBedrock,
 		Region:   "us-east-1",
 	})
 	if err != nil {
@@ -66,8 +66,8 @@ func main() {
 	}
 
 	// Ollama client (works locally, no credentials needed)
-	ollamaClient, err := metallm.NewClient(metallm.ClientConfig{
-		Provider: metallm.ProviderNameOllama,
+	ollamaClient, err := omnillm.NewClient(omnillm.ClientConfig{
+		Provider: omnillm.ProviderNameOllama,
 		BaseURL:  "http://localhost:11434",
 	})
 	if err != nil {
@@ -90,11 +90,11 @@ func main() {
 	fmt.Println()
 	fmt.Println("Example unified request structure:")
 	fmt.Println("Cloud model example:")
-	cloudReq := &metallm.ChatCompletionRequest{
-		Model: metallm.ModelGPT4o, // OpenAI cloud model
-		Messages: []metallm.Message{
-			{Role: metallm.RoleSystem, Content: "You are a helpful assistant."},
-			{Role: metallm.RoleUser, Content: "Hello, world!"},
+	cloudReq := &omnillm.ChatCompletionRequest{
+		Model: omnillm.ModelGPT4o, // OpenAI cloud model
+		Messages: []omnillm.Message{
+			{Role: omnillm.RoleSystem, Content: "You are a helpful assistant."},
+			{Role: omnillm.RoleUser, Content: "Hello, world!"},
 		},
 		MaxTokens:   &[]int{100}[0],
 		Temperature: &[]float64{0.7}[0],
@@ -103,11 +103,11 @@ func main() {
 
 	fmt.Println()
 	fmt.Println("Local model example:")
-	localReq := &metallm.ChatCompletionRequest{
+	localReq := &omnillm.ChatCompletionRequest{
 		Model: "llama3", // Ollama local model
-		Messages: []metallm.Message{
-			{Role: metallm.RoleSystem, Content: "You are a helpful assistant."},
-			{Role: metallm.RoleUser, Content: "Hello, world!"},
+		Messages: []omnillm.Message{
+			{Role: omnillm.RoleSystem, Content: "You are a helpful assistant."},
+			{Role: omnillm.RoleUser, Content: "Hello, world!"},
 		},
 		MaxTokens:   &[]int{100}[0],
 		Temperature: &[]float64{0.7}[0],

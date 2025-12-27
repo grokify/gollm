@@ -1,4 +1,4 @@
-module github.com/grokify/metallm
+module github.com/agentplexus/omnillm
 
 go 1.24.5
 

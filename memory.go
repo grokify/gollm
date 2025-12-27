@@ -1,4 +1,4 @@
-package metallm
+package omnillm
 
 import (
 	"context"
@@ -23,7 +23,7 @@ func DefaultMemoryConfig() MemoryConfig {
 	return MemoryConfig{
 		MaxMessages: 50,
 		TTL:         24 * time.Hour,
-		KeyPrefix:   "metallm:session",
+		KeyPrefix:   "omnillm:session",
 	}
 }
 

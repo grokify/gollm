@@ -1,6 +1,6 @@
-package metallm
+package omnillm
 
-import "github.com/grokify/metallm/models"
+import "github.com/agentplexus/omnillm/models"
 
 const (
 	EnvVarAnthropicAPIKey = "ANTHROPIC_API_KEY" // #nosec G101
@@ -23,7 +23,7 @@ const (
 
 // Common model constants for each provider.
 //
-// NOTE: For new code, prefer importing "github.com/grokify/metallm/models" directly
+// NOTE: For new code, prefer importing "github.com/agentplexus/omnillm/models" directly
 // for better organization and documentation. These constants are maintained for
 // backwards compatibility with existing code.
 const (

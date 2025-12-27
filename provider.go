@@ -1,6 +1,6 @@
-package metallm
+package omnillm
 
-import "github.com/grokify/metallm/provider"
+import "github.com/agentplexus/omnillm/provider"
 
 // Provider is an alias to the provider.Provider interface for backward compatibility
 type Provider = provider.Provider

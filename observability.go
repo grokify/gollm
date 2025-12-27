@@ -1,4 +1,4 @@
-package metallm
+package omnillm
 
 import (
 	"context"
@@ -6,7 +6,7 @@ import (
 	"encoding/hex"
 	"time"
 
-	"github.com/grokify/metallm/provider"
+	"github.com/agentplexus/omnillm/provider"
 )
 
 // LLMCallInfo provides metadata about the LLM call for observability
@@ -27,7 +27,7 @@ func newCallID() string {
 
 // ObservabilityHook allows external packages to observe LLM calls.
 // Implementations can use this to add tracing, logging, or metrics
-// without modifying the core MetaLLM library.
+// without modifying the core OmniLLM library.
 type ObservabilityHook interface {
 	// BeforeRequest is called before each LLM call.
 	// Returns a new context for trace/span propagation.

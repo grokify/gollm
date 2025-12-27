@@ -6,15 +6,15 @@ import (
 	"log"
 	"os"
 
-	"github.com/grokify/metallm"
+	"github.com/agentplexus/omnillm"
 )
 
 // ProviderDemo holds configuration for demonstrating a specific provider
 type ProviderDemo struct {
 	Name     string
-	Config   metallm.ClientConfig
+	Config   omnillm.ClientConfig
 	Model    string
-	Messages []metallm.Message
+	Messages []omnillm.Message
 }
 
 func main() {
@@ -22,60 +22,60 @@ func main() {
 	demos := []ProviderDemo{
 		{
 			Name: "OpenAI",
-			Config: metallm.ClientConfig{
-				Provider: metallm.ProviderNameOpenAI,
+			Config: omnillm.ClientConfig{
+				Provider: omnillm.ProviderNameOpenAI,
 				APIKey:   os.Getenv("OPENAI_API_KEY"),
 			},
-			Model: metallm.ModelGPT4o,
-			Messages: []metallm.Message{
+			Model: omnillm.ModelGPT4o,
+			Messages: []omnillm.Message{
 				{
-					Role:    metallm.RoleUser,
+					Role:    omnillm.RoleUser,
 					Content: "Hello! Can you explain what a unified LLM SDK is?",
 				},
 			},
 		},
 		{
 			Name: "Anthropic",
-			Config: metallm.ClientConfig{
-				Provider: metallm.ProviderNameAnthropic,
+			Config: omnillm.ClientConfig{
+				Provider: omnillm.ProviderNameAnthropic,
 				APIKey:   os.Getenv("ANTHROPIC_API_KEY"),
 			},
-			Model: metallm.ModelClaude3Sonnet,
-			Messages: []metallm.Message{
+			Model: omnillm.ModelClaude3Sonnet,
+			Messages: []omnillm.Message{
 				{
-					Role:    metallm.RoleSystem,
+					Role:    omnillm.RoleSystem,
 					Content: "You are a helpful assistant that explains technical concepts clearly.",
 				},
 				{
-					Role:    metallm.RoleUser,
+					Role:    omnillm.RoleUser,
 					Content: "What are the benefits of using a unified SDK for multiple LLM providers?",
 				},
 			},
 		},
 		{
 			Name: "AWS Bedrock",
-			Config: metallm.ClientConfig{
-				Provider: metallm.ProviderNameBedrock,
+			Config: omnillm.ClientConfig{
+				Provider: omnillm.ProviderNameBedrock,
 				Region:   "us-east-1",
 			},
-			Model: metallm.ModelBedrockClaude3Sonnet,
-			Messages: []metallm.Message{
+			Model: omnillm.ModelBedrockClaude3Sonnet,
+			Messages: []omnillm.Message{
 				{
-					Role:    metallm.RoleUser,
+					Role:    omnillm.RoleUser,
 					Content: "Explain the advantages of using AWS Bedrock for LLM deployments.",
 				},
 			},
 		},
 		{
 			Name: "Ollama (Local)",
-			Config: metallm.ClientConfig{
-				Provider: metallm.ProviderNameOllama,
+			Config: omnillm.ClientConfig{
+				Provider: omnillm.ProviderNameOllama,
 				BaseURL:  "http://localhost:11434",
 			},
 			Model: "llama3", // Use the model name as it appears in "ollama list"
-			Messages: []metallm.Message{
+			Messages: []omnillm.Message{
 				{
-					Role:    metallm.RoleUser,
+					Role:    omnillm.RoleUser,
 					Content: "What are the benefits of running LLMs locally with Ollama?",
 				},
 			},
@@ -94,13 +94,13 @@ func main() {
 
 // demonstrateProvider is a generic function that works with any provider
 func demonstrateProvider(demo ProviderDemo) error {
-	client, err := metallm.NewClient(demo.Config)
+	client, err := omnillm.NewClient(demo.Config)
 	if err != nil {
 		return err
 	}
 	defer client.Close()
 
-	response, err := client.CreateChatCompletion(context.Background(), &metallm.ChatCompletionRequest{
+	response, err := client.CreateChatCompletion(context.Background(), &omnillm.ChatCompletionRequest{
 		Model:       demo.Model,
 		Messages:    demo.Messages,
 		MaxTokens:   intPtr(150),

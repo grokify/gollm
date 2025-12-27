@@ -1,4 +1,4 @@
-# MetaLLM Feature Roadmap
+# OmniLLM Feature Roadmap
 
 ## High Value
 
@@ -12,8 +12,8 @@ rt := retryhttp.NewWithOptions(
     retryhttp.WithMaxRetries(5),
     retryhttp.WithInitialBackoff(500 * time.Millisecond),
 )
-client, err := metallm.NewClient(metallm.ClientConfig{
-    Provider:   metallm.ProviderNameOpenAI,
+client, err := omnillm.NewClient(omnillm.ClientConfig{
+    Provider:   omnillm.ProviderNameOpenAI,
     APIKey:     "...",
     HTTPClient: &http.Client{Transport: rt},
 })
@@ -33,9 +33,9 @@ Automatic failover when primary provider fails.
 
 ```go
 ClientConfig{
-    Provider: metallm.ProviderNameOpenAI,
+    Provider: omnillm.ProviderNameOpenAI,
     FallbackProviders: []ProviderConfig{
-        {Provider: metallm.ProviderNameAnthropic, APIKey: "..."},
+        {Provider: omnillm.ProviderNameAnthropic, APIKey: "..."},
     },
 }
 ```

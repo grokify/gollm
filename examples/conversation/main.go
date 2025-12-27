@@ -8,7 +8,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/grokify/metallm"
+	"github.com/agentplexus/omnillm"
 )
 
 func main() {
@@ -25,14 +25,14 @@ func main() {
 
 func runConversation() error {
 	scanner := bufio.NewScanner(os.Stdin)
-	messages := []metallm.Message{
+	messages := []omnillm.Message{
 		{
-			Role:    metallm.RoleSystem,
+			Role:    omnillm.RoleSystem,
 			Content: "You are a helpful assistant. Keep your responses concise and friendly.",
 		},
 	}
 
-	currentProvider := metallm.ProviderNameOpenAI
+	currentProvider := omnillm.ProviderNameOpenAI
 	client, err := createClient(currentProvider)
 	if err != nil {
 		return err
@@ -70,13 +70,13 @@ func runConversation() error {
 		}
 
 		// Add user message
-		messages = append(messages, metallm.Message{
-			Role:    metallm.RoleUser,
+		messages = append(messages, omnillm.Message{
+			Role:    omnillm.RoleUser,
 			Content: input,
 		})
 
 		// Get response
-		response, err := client.CreateChatCompletion(context.Background(), &metallm.ChatCompletionRequest{
+		response, err := client.CreateChatCompletion(context.Background(), &omnillm.ChatCompletionRequest{
 			Model:       getModelForProvider(currentProvider),
 			Messages:    messages,
 			MaxTokens:   intPtr(150),
@@ -92,8 +92,8 @@ func runConversation() error {
 		fmt.Printf("Assistant (%s): %s\n", currentProvider, assistantMessage)
 
 		// Add assistant response to conversation
-		messages = append(messages, metallm.Message{
-			Role:    metallm.RoleAssistant,
+		messages = append(messages, omnillm.Message{
+			Role:    omnillm.RoleAssistant,
 			Content: assistantMessage,
 		})
 
@@ -108,44 +108,44 @@ func runConversation() error {
 	return nil
 }
 
-func createClient(provider metallm.ProviderName) (*metallm.ChatClient, error) {
-	config := metallm.ClientConfig{Provider: provider}
+func createClient(provider omnillm.ProviderName) (*omnillm.ChatClient, error) {
+	config := omnillm.ClientConfig{Provider: provider}
 
 	switch provider {
-	case metallm.ProviderNameOpenAI:
+	case omnillm.ProviderNameOpenAI:
 		config.APIKey = os.Getenv("OPENAI_API_KEY")
-	case metallm.ProviderNameAnthropic:
+	case omnillm.ProviderNameAnthropic:
 		config.APIKey = os.Getenv("ANTHROPIC_API_KEY")
-	case metallm.ProviderNameBedrock:
+	case omnillm.ProviderNameBedrock:
 		config.Region = "us-east-1"
 	}
 
-	return metallm.NewClient(config)
+	return omnillm.NewClient(config)
 }
 
-func getNextProvider(current metallm.ProviderName) metallm.ProviderName {
+func getNextProvider(current omnillm.ProviderName) omnillm.ProviderName {
 	switch current {
-	case metallm.ProviderNameOpenAI:
-		return metallm.ProviderNameAnthropic
-	case metallm.ProviderNameAnthropic:
-		return metallm.ProviderNameBedrock
-	case metallm.ProviderNameBedrock:
-		return metallm.ProviderNameOpenAI
+	case omnillm.ProviderNameOpenAI:
+		return omnillm.ProviderNameAnthropic
+	case omnillm.ProviderNameAnthropic:
+		return omnillm.ProviderNameBedrock
+	case omnillm.ProviderNameBedrock:
+		return omnillm.ProviderNameOpenAI
 	default:
-		return metallm.ProviderNameOpenAI
+		return omnillm.ProviderNameOpenAI
 	}
 }
 
-func getModelForProvider(provider metallm.ProviderName) string {
+func getModelForProvider(provider omnillm.ProviderName) string {
 	switch provider {
-	case metallm.ProviderNameOpenAI:
-		return metallm.ModelGPT4oMini
-	case metallm.ProviderNameAnthropic:
-		return metallm.ModelClaude3Haiku
-	case metallm.ProviderNameBedrock:
-		return metallm.ModelBedrockClaude3Sonnet
+	case omnillm.ProviderNameOpenAI:
+		return omnillm.ModelGPT4oMini
+	case omnillm.ProviderNameAnthropic:
+		return omnillm.ModelClaude3Haiku
+	case omnillm.ProviderNameBedrock:
+		return omnillm.ModelBedrockClaude3Sonnet
 	default:
-		return metallm.ModelGPT4oMini
+		return omnillm.ModelGPT4oMini
 	}
 }
 

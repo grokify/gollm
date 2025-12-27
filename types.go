@@ -1,6 +1,6 @@
-package metallm
+package omnillm
 
-import "github.com/grokify/metallm/provider"
+import "github.com/agentplexus/omnillm/provider"
 
 // Type aliases for backward compatibility and convenience
 type Role = provider.Role

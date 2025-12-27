@@ -12,7 +12,7 @@ import (
 
 	"github.com/grokify/sogo/database/kvs"
 
-	"github.com/grokify/metallm"
+	"github.com/agentplexus/omnillm"
 )
 
 // mockKVS is a simple in-memory implementation of the KVS interface for demonstration
@@ -65,7 +65,7 @@ func (m *mockKVS) GetAny(ctx context.Context, key string, val any) error {
 }
 
 func main() {
-	fmt.Println("=== metallm Memory Demo ===")
+	fmt.Println("=== omnillm Memory Demo ===")
 	fmt.Println("This example demonstrates conversation memory using a KVS backend.")
 	fmt.Println("Type 'quit' to exit, 'new' to start a new session, 'sessions' to list sessions")
 	fmt.Println("Note: This uses a mock in-memory KVS for demonstration.")
@@ -81,7 +81,7 @@ func runMemoryDemo() error {
 	mockKVS := newMockKVS()
 
 	// Configure memory settings
-	memoryConfig := metallm.MemoryConfig{
+	memoryConfig := omnillm.MemoryConfig{
 		MaxMessages: 20, // Keep last 20 messages per session
 		TTL:         2 * time.Hour,
 		KeyPrefix:   "demo:session",
@@ -177,8 +177,8 @@ func runMemoryDemo() error {
 		}
 
 		// Create user message
-		userMessage := metallm.Message{
-			Role:    metallm.RoleUser,
+		userMessage := omnillm.Message{
+			Role:    omnillm.RoleUser,
 			Content: input,
 		}
 
@@ -186,9 +186,9 @@ func runMemoryDemo() error {
 		response, err := client.CreateChatCompletionWithMemory(
 			context.Background(),
 			currentSessionID,
-			&metallm.ChatCompletionRequest{
+			&omnillm.ChatCompletionRequest{
 				Model:       getAvailableModel(),
-				Messages:    []metallm.Message{userMessage},
+				Messages:    []omnillm.Message{userMessage},
 				MaxTokens:   intPtr(200),
 				Temperature: float64Ptr(0.7),
 			},
@@ -215,43 +215,43 @@ func runMemoryDemo() error {
 	return nil
 }
 
-func createClientWithMemory(kvsClient kvs.Client, memoryConfig *metallm.MemoryConfig) (*metallm.ChatClient, error) {
+func createClientWithMemory(kvsClient kvs.Client, memoryConfig *omnillm.MemoryConfig) (*omnillm.ChatClient, error) {
 	// Try to get API keys from environment
-	var provider metallm.ProviderName
+	var provider omnillm.ProviderName
 	var apiKey string
 
 	if openaiKey := os.Getenv("OPENAI_API_KEY"); openaiKey != "" {
-		provider = metallm.ProviderNameOpenAI
+		provider = omnillm.ProviderNameOpenAI
 		apiKey = openaiKey
 	} else if anthropicKey := os.Getenv("ANTHROPIC_API_KEY"); anthropicKey != "" {
-		provider = metallm.ProviderNameAnthropic
+		provider = omnillm.ProviderNameAnthropic
 		apiKey = anthropicKey
 	} else {
 		// Fall back to Bedrock (which doesn't require API key in config)
-		provider = metallm.ProviderNameBedrock
+		provider = omnillm.ProviderNameBedrock
 	}
 
-	config := metallm.ClientConfig{
+	config := omnillm.ClientConfig{
 		Provider:     provider,
 		APIKey:       apiKey,
 		Memory:       kvsClient,
 		MemoryConfig: memoryConfig,
 	}
 
-	if provider == metallm.ProviderNameBedrock {
+	if provider == omnillm.ProviderNameBedrock {
 		config.Region = "us-east-1"
 	}
 
-	return metallm.NewClient(config)
+	return omnillm.NewClient(config)
 }
 
 func getAvailableModel() string {
 	if os.Getenv("OPENAI_API_KEY") != "" {
-		return metallm.ModelGPT4oMini
+		return omnillm.ModelGPT4oMini
 	} else if os.Getenv("ANTHROPIC_API_KEY") != "" {
-		return metallm.ModelClaude3Haiku
+		return omnillm.ModelClaude3Haiku
 	} else {
-		return metallm.ModelBedrockClaude3Sonnet
+		return omnillm.ModelBedrockClaude3Sonnet
 	}
 }
 

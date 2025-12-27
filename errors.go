@@ -1,4 +1,4 @@
-package metallm
+package omnillm
 
 import (
 	"errors"
@@ -8,7 +8,7 @@ import (
 var (
 	// Common errors
 	ErrUnsupportedProvider  = errors.New("unsupported provider")
-	ErrBedrockExternal      = errors.New("bedrock provider moved to github.com/grokify/metallm-bedrock; use CustomProvider to inject it")
+	ErrBedrockExternal      = errors.New("bedrock provider moved to github.com/agentplexus/omnillm-bedrock; use CustomProvider to inject it")
 	ErrInvalidConfiguration = errors.New("invalid configuration")
 	ErrEmptyAPIKey          = errors.New("API key cannot be empty")
 	ErrEmptyModel           = errors.New("model cannot be empty")

@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/grokify/metallm"
+	"github.com/agentplexus/omnillm"
 )
 
 func main() {
@@ -25,8 +25,8 @@ func main() {
 }
 
 func demonstrateOpenAIStreaming() error {
-	client, err := metallm.NewClient(metallm.ClientConfig{
-		Provider: metallm.ProviderNameOpenAI,
+	client, err := omnillm.NewClient(omnillm.ClientConfig{
+		Provider: omnillm.ProviderNameOpenAI,
 		APIKey:   os.Getenv("OPENAI_API_KEY"),
 	})
 	if err != nil {
@@ -34,11 +34,11 @@ func demonstrateOpenAIStreaming() error {
 	}
 	defer client.Close()
 
-	stream, err := client.CreateChatCompletionStream(context.Background(), &metallm.ChatCompletionRequest{
-		Model: metallm.ModelGPT4o,
-		Messages: []metallm.Message{
+	stream, err := client.CreateChatCompletionStream(context.Background(), &omnillm.ChatCompletionRequest{
+		Model: omnillm.ModelGPT4o,
+		Messages: []omnillm.Message{
 			{
-				Role:    metallm.RoleUser,
+				Role:    omnillm.RoleUser,
 				Content: "Write a short story about a robot learning to paint. Keep it under 100 words.",
 			},
 		},
@@ -70,8 +70,8 @@ func demonstrateOpenAIStreaming() error {
 }
 
 func demonstrateAnthropicStreaming() error {
-	client, err := metallm.NewClient(metallm.ClientConfig{
-		Provider: metallm.ProviderNameAnthropic,
+	client, err := omnillm.NewClient(omnillm.ClientConfig{
+		Provider: omnillm.ProviderNameAnthropic,
 		APIKey:   os.Getenv("ANTHROPIC_API_KEY"),
 	})
 	if err != nil {
@@ -79,15 +79,15 @@ func demonstrateAnthropicStreaming() error {
 	}
 	defer client.Close()
 
-	stream, err := client.CreateChatCompletionStream(context.Background(), &metallm.ChatCompletionRequest{
-		Model: metallm.ModelClaude3Haiku,
-		Messages: []metallm.Message{
+	stream, err := client.CreateChatCompletionStream(context.Background(), &omnillm.ChatCompletionRequest{
+		Model: omnillm.ModelClaude3Haiku,
+		Messages: []omnillm.Message{
 			{
-				Role:    metallm.RoleSystem,
+				Role:    omnillm.RoleSystem,
 				Content: "You are a creative writing assistant.",
 			},
 			{
-				Role:    metallm.RoleUser,
+				Role:    omnillm.RoleUser,
 				Content: "Write a haiku about programming. Make it thoughtful and concise.",
 			},
 		},

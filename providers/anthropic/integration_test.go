@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/grokify/metallm/provider"
+	"github.com/agentplexus/omnillm/provider"
 )
 
 // TestAnthropicIntegration_ChatCompletion tests actual API calls

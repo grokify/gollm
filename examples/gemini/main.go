@@ -6,7 +6,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/grokify/metallm"
+	"github.com/agentplexus/omnillm"
 )
 
 func main() {
@@ -17,8 +17,8 @@ func main() {
 	}
 
 	// Create a Gemini client
-	client, err := metallm.NewClient(metallm.ClientConfig{
-		Provider: metallm.ProviderNameGemini,
+	client, err := omnillm.NewClient(omnillm.ClientConfig{
+		Provider: omnillm.ProviderNameGemini,
 		APIKey:   apiKey,
 	})
 	if err != nil {
@@ -27,11 +27,11 @@ func main() {
 	defer client.Close()
 
 	// Create a chat completion request
-	response, err := client.CreateChatCompletion(context.Background(), &metallm.ChatCompletionRequest{
-		Model: metallm.ModelGemini1_5Flash,
-		Messages: []metallm.Message{
+	response, err := client.CreateChatCompletion(context.Background(), &omnillm.ChatCompletionRequest{
+		Model: omnillm.ModelGemini1_5Flash,
+		Messages: []omnillm.Message{
 			{
-				Role:    metallm.RoleUser,
+				Role:    omnillm.RoleUser,
 				Content: "Hello! Can you tell me a short joke?",
 			},
 		},
